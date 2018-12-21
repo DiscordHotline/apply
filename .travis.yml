@@ -1,0 +1,12 @@
+language: node_js
+
+node_js:
+    - "10"
+
+sudo: false
+
+install:
+    - npm i
+
+script:
+    - npx serverless deploy --stage prod --verbose --region=us-east-1 --vault-address=${VAULT_ADDR} --vault-role-id=${VAULT_ROLE_ID} --vault-secret-id=${VAULT_SECRET_ID}

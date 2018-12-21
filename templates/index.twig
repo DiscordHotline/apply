@@ -1,0 +1,111 @@
+<html lang="en">
+    <head>
+        <title>Discord Hotline</title>
+        <meta name="keywords" content="Discord, Discord Moderators, Discord Moderation, Discord Hotline"/>
+        <meta name="description" content="Apply to join Discord Hotline and our community of moderators!"/>
+
+        <meta property="og:title" content="Discord Hotline"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:locale" content="en_US"/>
+        <meta property="og:url" content="https://apply.hotline.gg"/>
+        <!--meta property="og:image" content={server.iconUrl}/-->
+        <meta property="og:site_name" content="Discord Hotline"/>
+        <meta property="og:description" content="Apply to join Discord Hotline and our community of moderators!"/>
+        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+              integrity="sha256-2pUeJf+y0ltRPSbKOeJh09ipQFYxUdct5nTY6GAXswA=" crossorigin="anonymous"/>
+        <link rel="stylesheet" href="/assets/style.css">
+    </head>
+    <body>
+        <section class="hero is-fullheight">
+            <div class="hero-body">
+                <div class="container">
+                    <div class="columns centered">
+                        <div class="column is-6">
+                            <img alt="logo" src="{{ logo }}"/>
+                        </div>
+                        <div class="column is-6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h1 class="title is-2">
+                                        Apply to Discord Hotline
+                                    </h1>
+
+                                    <hr />
+
+                                    <div class="content">
+                                        {% if user is defined %}<p>Hello {{ user.username }},</p>{% endif %}
+                                        <p>
+                                            Discord Hotline is a networking community of moderators. It's a place
+                                            where you can go to ask questions about other servers moderation. We also
+                                            have an early warning system for problematic users and raids.
+                                        </p>
+                                        {% if not submited %}
+                                            <p>
+                                                If you would like to apply to join,
+                                                {% if user is not defined %}
+                                                    <a href="/connect">log in.</a>
+                                                {% else %}
+                                                    fill out the form below.
+                                                {% endif %}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if user is defined %}
+                                        <hr/>
+
+                                        <div class="content">
+                                            {% if submitted %}
+                                                <p class="has-text-weight-bold">Thank you for submitting! You should hear back soon.</p>
+                                            {% else %}
+                                                <form action="/" method="post">
+                                                    <div class="field">
+                                                        <label class="label" for="server">
+                                                            What is the name of the server would you like to apply with?
+                                                        </label>
+                                                        <div class="control">
+                                                            <input type="text" class="input" name="server" required />
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label class="label" for="reason">
+                                                            Why do you think this server is a good fit in Discord Hotline?
+                                                        </label>
+                                                        <div class="control">
+                                                            <textarea name="reason" class="textarea" required></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="field">
+                                                        <label class="label" for="invite">
+                                                            Please supply a permanent invite for this server:
+                                                        </label>
+                                                        <div class="control">
+                                                            <input type="text" class="input" name="invite" required/>
+                                                        </div>
+                                                    </div>
+
+                                                    <br />
+
+                                                    <div class="field is-grouped is-pulled-right">
+                                                        <div class="control">
+                                                            <button class="button is-link">Submit</button>
+                                                        </div>
+                                                        <div class="control">
+                                                            <button class="button is-text">Cancel</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="is-clearfix"></div>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
