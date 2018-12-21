@@ -37,18 +37,24 @@ module.exports = async (callback) => {
     }
 
     // Fetch the secrets we want
-    const [def, mainDatabase, discord, apply, database] = await Promise.all([
-        read('secret/hotline/default', false),
-        read('secret/hotline/database'),
-        read('secret/hotline/discord'),
-        read('secret/hotline/apply/discord'),
-        read('secret/hotline/apply/database'),
-    ]);
+    try {
+        const [def, mainDatabase, discord, apply, database] = await Promise.all([
+            read('secret/hotline/default', false),
+            read('secret/hotline/database'),
+            read('secret/hotline/discord'),
+            read('secret/hotline/apply/discord'),
+            read('secret/hotline/apply/database'),
+        ]);
 
-    process.vault   = vault;
-    process.secrets = {default: def, mainDatabase, database, discord, apply};
+        process.vault   = vault;
+        process.secrets = {default: def, mainDatabase, database, discord, apply};
 
-    await callback(vault);
+        await callback(vault);
 
-    return vault;
+        return vault;
+    } catch (e) {
+        console.error(e);
+
+        throw e;
+    }
 };

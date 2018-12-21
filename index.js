@@ -19,16 +19,21 @@ require('twig').cache(process.env.NODE_ENV === 'prod');
 const handler          = serverless(app);
 module.exports.handler = async (event, context) => {
     try {
-        await initializeVault(() => {
-            require('./middleware/session')(app);
-            app.get('/logout', async (req, res) => {
-                req.logout();
-                res.redirect('/');
-            });
-            readdirSync(join(__dirname, './routes')).forEach(file => require(`./routes/${file}`)(app));
+        await initializeVault(async () => {
+            try {
+
+                require('./middleware/session')(app);
+                app.get('/logout', async (req, res) => {
+                    req.logout();
+                    res.redirect('/');
+                });
+                readdirSync(join(__dirname, './routes')).forEach(file => require(`./routes/${file}`)(app));
+                app.database = await initializeDatabase();
+                app.eris     = new Eris('Bot ' + process.secrets.discord.token, {restMode: true});
+            } catch (e) {
+                console.error(e);
+            }
         });
-        app.database = await initializeDatabase();
-        app.eris     = new Eris('Bot ' + process.secrets.discord.token, {restMode: true});
 
         return await handler(event, context);
     } catch (e) {
