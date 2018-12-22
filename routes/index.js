@@ -31,7 +31,9 @@ module.exports = (app) => app
                             {name: 'Invite Code', value: form.invite, inline: true},
                             {name: 'Requester', value: `<@${req.user.id}>`, inline: true},
                         ],
-                        timestamp:   (new Date()).toISOString(),
+                        timestamp:   (
+                                         new Date()
+                                     ).toISOString(),
                     },
                 ],
             }).fire();
@@ -49,6 +51,7 @@ module.exports = (app) => app
         app.database.query('INSERT INTO `applications` SET ?', {
             posted,
             approval_message_id: messageId,
+            request_user:        req.user.id,
             server:              form.server,
             reason:              form.reason,
             invite_code:         form.invite,
