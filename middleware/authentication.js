@@ -1,4 +1,4 @@
-module.exports = function authenticationMiddleware() {
+module.exports = function authenticationMiddleware(...scopes) {
     return function(req, res, next) {
         if (req.isAuthenticated()) {
             return next()
@@ -8,6 +8,11 @@ module.exports = function authenticationMiddleware() {
             req.session.lastUrl = req.originalUrl;
         }
 
-        res.redirect('/connect');
+        if (!scopes) {
+            res.redirect('/connect');
+        } else {
+            console.log(scopes)
+            res.redirect('/connect?scopes=' + scopes.join(','))
+        }
     }
 };

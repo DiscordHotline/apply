@@ -1,8 +1,6 @@
 const serverless      = require('serverless-http');
 const express         = require('express');
 const {join, resolve} = require('path');
-const {readdirSync}   = require('fs');
-const Eris            = require('eris');
 
 const vault      = require('./util/vault');
 const database   = require('./util/database');
@@ -28,7 +26,7 @@ module.exports.handler = async (event, context) => {
         await vault.initialize();
         await vault.loadSecrets();
         await Promise.all([
-            await database.initialize(app),
+            await database.initialize(),
             await middleware.initialize(app),
             await routes.initialize(app),
         ]);

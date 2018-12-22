@@ -1,32 +1,38 @@
-const mysql = require('mysql');
+let connection = require('serverless-mysql')();
+let configured = false;
 
-let connection;
-let connected = false;
+const query = async (sql, values) => connection.query({
+    sql, values, typeCast: function (field, next) {
+        if (field.type === 'LONGLONG') {
+            return field.string();
+        }
+
+        return next();
+    },
+});
 
 module.exports = {
-    initialize: async (app) => {
-        if (connection) {
-            app.database = connection;
+    initialize:                 async () => {
+        if (configured) {
             return;
         }
         console.log('Initializing Database');
 
-        return new Promise((resolve, reject) => {
-            connection = mysql.createConnection({
-                host:     process.secrets.mainDatabase.dsn,
-                user:     process.secrets.database.user,
-                password: process.secrets.database.password,
-                database: process.secrets.database.database,
-            });
+        connection.config({
+            host:     process.secrets.mainDatabase.dsn,
+            user:     process.secrets.database.user,
+            password: process.secrets.database.password,
+            database: process.secrets.database.database,
+            typeCast: false,
+        });
 
-            connection.connect(err => {
-                if (err) {
-                    return reject(err);
-                }
+        configured = true;
+    },
+    query,
+    getApplicationByInviteCode: async (code) => {
+        const sql     = 'SELECT * FROM `applications` WHERE `hotline_invite_code` = ?';
+        const results = await query(sql, [code]);
 
-                app.database = connection;
-                resolve();
-            })
-        })
-    }
+        return results[0];
+    },
 };

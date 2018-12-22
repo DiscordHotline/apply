@@ -59,7 +59,7 @@ module.exports = {
 
             process.secrets = {default: def, mainDatabase, database, discord, apply};
         } catch (e) {
-            console.error(e);
+            console.error('Error loading secrets: ', e);
 
             throw e;
         }

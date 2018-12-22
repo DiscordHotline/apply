@@ -61,7 +61,11 @@ module.exports = (app) => {
         },
     ));
 
-    app.get(`/connect`, passport.authenticate(authType, {scope: ['identify']}));
+    app.get(`/connect`, (req, res, next) => {
+        const scope = ['identify', ...req.query.scopes ? req.query.scopes.split(',') : []];
+
+        return passport.authenticate(authType, {scope})(req, res, next);
+    });
     app.get(
         `/connect/callback`,
         (req, res) => passport.authenticate(authType, (err, user) => {
@@ -77,8 +81,10 @@ module.exports = (app) => {
 
                     return res.statusCode(500).send(err.message);
                 }
+                const redirect = req.session.lastUrl || url;
+                delete req.session.lastUrl;
 
-                res.redirect(url);
+                res.redirect(redirect);
             });
         })(req, res),
     );

@@ -1,0 +1,72 @@
+<html lang="en">
+    <head>
+        <title>Discord Hotline - Join</title>
+        <meta name="keywords" content="Discord, Discord Moderators, Discord Moderation, Discord Hotline"/>
+        <meta name="description" content="Apply to join Discord Hotline and our community of moderators!"/>
+
+        <meta property="og:title" content="Discord Hotline"/>
+        <meta property="og:type" content="website"/>
+        <meta property="og:locale" content="en_US"/>
+        <meta property="og:url" content="https://apply.hotline.gg"/>
+        <!--meta property="og:image" content={server.iconUrl}/-->
+        <meta property="og:site_name" content="Discord Hotline"/>
+        <meta property="og:description" content="Apply to join Discord Hotline and our community of moderators!"/>
+        <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"
+              integrity="sha256-2pUeJf+y0ltRPSbKOeJh09ipQFYxUdct5nTY6GAXswA=" crossorigin="anonymous"/>
+        <link rel="stylesheet" href="/assets/style.css">
+    </head>
+    <body>
+        <section class="hero is-fullheight">
+            <div class="hero-body">
+                <div class="container">
+                    <div class="columns centered">
+                        <div class="column is-6">
+                            <img alt="logo" src="{{ logo }}"/>
+                        </div>
+                        <div class="column is-6">
+                            <div class="card">
+                                <div class="card-content">
+                                    <h1 class="title is-2 has-text-centered">
+                                        Join Discord Hotline
+                                    </h1>
+
+                                    <hr />
+
+                                    <div class="content">
+                                        <p>Hello {{ user.username }},</p>
+                                        {% if join is not defined %}
+                                            <p>
+                                                You have been accepted into the Discord Hotline community as a part of:
+                                            </p>
+                                            <h3 class="is-title is-3 has-text-centered">{{ application.server }}</h3>
+                                            <br />
+                                            <p>
+                                                Click the link below, and you will be added to the server. If you are the
+                                                server owner, or server representative, message a member of staff when you join.
+                                            </p>
+                                            <form method="post">
+                                                <button type="submit" class="button is-info is-fullwidth">Join the Community!</button>
+                                            </form>
+                                        {% else %}
+                                            {% if join %}
+                                                <p>
+                                                    You have been successfully added to the community! You can close this window.
+                                                </p>
+                                            {% else %}
+                                                <p>
+                                                    We could not add you at this time. Please contact the person who sent you this link
+                                                    or a Discord Hotline administrator to get this sorted.
+                                                </p>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </body>
+</html>
