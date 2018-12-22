@@ -1,6 +1,7 @@
 const InitializeVault = require('node-vault');
 
 let vault;
+let initialized = false;
 
 async function read(secret, required = true) {
     try {
@@ -20,7 +21,7 @@ async function read(secret, required = true) {
 
 module.exports = async (callback) => {
     // If vault exists, we've done this already.
-    if (vault !== undefined) {
+    if (vault !== undefined || !initialized) {
         return vault;
     }
 
