@@ -27,13 +27,11 @@ module.exports.handler = async (event, context) => {
     try {
         await vault.initialize();
         await vault.loadSecrets();
-        console.log(Object.keys(process.secrets));
         await Promise.all([
             await database.initialize(app),
             await middleware.initialize(app),
             await routes.initialize(app),
         ]);
-        console.log('Handling Request');
 
         return await handler(event, context);
     } catch (e) {

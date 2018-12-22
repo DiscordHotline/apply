@@ -10,6 +10,8 @@ module.exports = {
         console.log('Initializing Middleware');
 
         require('../middleware/session')(app);
+
+        console.log('Initializing Eris');
         app.eris = new Eris('Bot ' + process.secrets.discord.token, {restMode: true});
 
         initialized = true;
