@@ -9,7 +9,7 @@ module.exports = {
         }
         console.log('Initializing Middleware');
 
-        require('../middleware/session')('app');
+        require('../middleware/session')(app);
         app.eris = new Eris('Bot ' + process.secrets.discord.token, {restMode: true});
 
         initialized = true;
