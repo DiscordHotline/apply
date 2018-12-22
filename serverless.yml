@@ -6,6 +6,7 @@ provider:
     region: us-east-1
     stage: ${opt:stage, 'prod'}
     memorySize: 128
+    timeout: 30
     environment:
         NODE_ENV: ${self:provider.stage, 'prod'}
         SESSION_TABLE: hotline-apply-session
