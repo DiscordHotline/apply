@@ -23,12 +23,13 @@ module.exports.handler = async (event, context) => {
         await initializeVault(async () => {
             console.log('Vault Initialized');
             try {
-
+                console.log('Initializing Middleware')
                 require('./middleware/session')(app);
                 app.get('/logout', async (req, res) => {
                     req.logout();
                     res.redirect('/');
                 });
+                console.log('Initializing Routes')
                 readdirSync(join(__dirname, './routes')).forEach(file => require(`./routes/${file}`)(app));
                 console.log('Initializing Database');
                 app.database = await initializeDatabase();
@@ -38,6 +39,7 @@ module.exports.handler = async (event, context) => {
                 console.error(e);
             }
         });
+        console.log('Handling Request');
 
         return await handler(event, context);
     } catch (e) {
