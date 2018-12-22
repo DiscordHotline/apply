@@ -4,10 +4,10 @@ const {join, resolve} = require('path');
 const {readdirSync}   = require('fs');
 const Eris            = require('eris');
 
-const vault    = require('./util/vault');
-const database = require('./util/database');
+const vault      = require('./util/vault');
+const database   = require('./util/database');
 const middleware = require('./util/middleware');
-const routes = require('./util/routes');
+const routes     = require('./util/routes');
 
 const app = express();
 app
@@ -27,9 +27,12 @@ module.exports.handler = async (event, context) => {
     try {
         await vault.initialize();
         await vault.loadSecrets();
-        await database.initialize(app);
-        await middleware.initialize(app);
-        await routes.initialize(app);
+        console.log(Object.keys(process.secrets));
+        await Promise.all([
+            await database.initialize(app),
+            await middleware.initialize(app),
+            await routes.initialize(app),
+        ]);
         console.log('Handling Request');
 
         return await handler(event, context);
