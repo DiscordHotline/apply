@@ -21,7 +21,7 @@ async function read(secret, required = true) {
 
 module.exports = async (callback) => {
     // If vault exists, we've done this already.
-    if (vault !== undefined || !initialized) {
+    if (vault !== undefined && !initialized) {
         return vault;
     }
 
@@ -51,6 +51,7 @@ module.exports = async (callback) => {
         process.secrets = {default: def, mainDatabase, database, discord, apply};
 
         await callback(vault);
+        initialized = true;
 
         return vault;
     } catch (e) {
