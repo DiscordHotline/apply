@@ -12,7 +12,7 @@ module.exports = {
         require('../middleware/session')(app);
 
         console.log('Initializing Eris');
-        app.eris = new Eris('Bot ' + process.secrets.discord.token, {restMode: true});
+        global.eris = app.eris = new Eris('Bot ' + process.secrets.discord.token, {restMode: true});
 
         initialized = true;
     },

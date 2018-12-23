@@ -22,7 +22,7 @@
                 <div class="container">
                     <div class="columns centered">
                         <div class="column is-6">
-                            <img alt="logo" src="{{ logo }}"/>
+                            <img alt="logo" src="https://s3.amazonaws.com/discord-hotline-asset-bucket/logo.png"/>
                         </div>
                         <div class="column is-6">
                             <div class="card">
@@ -31,7 +31,7 @@
                                         Apply to Discord Hotline
                                     </h1>
 
-                                    <hr />
+                                    <hr/>
 
                                     <div class="content">
                                         {% if user is defined %}<p>Hello {{ user.username }},</p>{% endif %}
@@ -56,36 +56,60 @@
                                         <hr/>
 
                                         <div class="content">
-                                            {% if submitted %}
-                                                <p class="has-text-weight-bold">Thank you for submitting! You should hear back soon.</p>
+                                            {% if submitted and success %}
+                                                <p class="has-text-weight-bold">Thank you for submitting! You should
+                                                    hear back soon.</p>
                                             {% else %}
+                                                {% if submitted and not success %}
+                                                    <div class="notification is-warning">
+                                                        There is an error with your submission, please correct it, and
+                                                        re-submit.
+                                                    </div>
+                                                {% endif %}
                                                 <form action="/" method="post">
                                                     <div class="field">
                                                         <label class="label" for="server">
                                                             What is the name of the server would you like to apply with?
                                                         </label>
                                                         <div class="control">
-                                                            <input type="text" class="input" name="server" required />
+                                                            <input type="text"
+                                                                   class="input {% if errors.server is defined %}is-danger{% endif %}"
+                                                                   name="server"
+                                                                   value="{{ form.server }}"/>
                                                         </div>
+                                                        {% if errors.server is defined %}
+                                                            <p class="help is-danger">{{ errors.server }}</p>
+                                                        {% endif %}
                                                     </div>
                                                     <div class="field">
                                                         <label class="label" for="reason">
-                                                            Why do you think this server is a good fit in Discord Hotline?
+                                                            Why do you think this server is a good fit in Discord
+                                                            Hotline?
                                                         </label>
                                                         <div class="control">
-                                                            <textarea name="reason" class="textarea" required></textarea>
+                                                            <textarea name="reason" class="textarea
+                                                                      {% if errors.reason is defined %}is-danger{% endif %}"
+                                                            >{{ form.reason }}</textarea>
                                                         </div>
+                                                        {% if errors.reason is defined %}
+                                                            <p class="help is-danger">{{ errors.reason }}</p>
+                                                        {% endif %}
                                                     </div>
                                                     <div class="field">
                                                         <label class="label" for="invite">
                                                             Please supply a permanent invite for this server:
                                                         </label>
                                                         <div class="control">
-                                                            <input type="text" class="input" name="invite" required/>
+                                                            <input type="text"
+                                                                   class="input {% if errors.invite is defined %}is-danger{% endif %}"
+                                                                   name="invite" value="{{ form.invite }}"/>
                                                         </div>
+                                                        {% if errors.invite is defined %}
+                                                            <p class="help is-danger">{{ errors.invite }}</p>
+                                                        {% endif %}
                                                     </div>
 
-                                                    <br />
+                                                    <br/>
 
                                                     <div class="field is-grouped is-pulled-right">
                                                         <div class="control">

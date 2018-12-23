@@ -2,25 +2,24 @@ const base64Img = require('base64-img');
 const {resolve} = require('path');
 const {parse}   = require('querystring');
 const {Hook}    = require('hookcord');
-const request    = require('request');
+const request   = require('request');
 
-const database = require('../util/database');
-const auth = require('../middleware/authentication');
+const isValidInvite = require('../util/isValidInvite');
+const database      = require('../util/database');
+const auth          = require('../middleware/authentication');
 
 const hook = new Hook();
 hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
 
-const logo = base64Img.base64Sync(resolve(__dirname, '..', 'assets', 'logo.png'));
-
 module.exports = (app) => app
     .get('/', async (req, res) => {
-        res.render('index', {user: req.user, logo});
+        res.render('index', {user: req.user, form: {}, errors: {}});
     })
     .get('/favicon.ico', (req, res) => res.send(404))
     .get('/:code', auth('guilds.join'), async (req, res) => {
         const application = await database.getApplicationByInviteCode(req.params.code);
 
-        res.render('join', {user: req.user, logo, application});
+        res.render('join', {user: req.user, application});
     })
     .post('/:code', auth('guilds.join'), async (req, res) => {
         const application = await database.getApplicationByInviteCode(req.params.code);
@@ -28,24 +27,37 @@ module.exports = (app) => app
         const guildId = process.secrets.discord.guild_id;
         request(
             {
-                url: `https://discordapp.com/api/v6/guilds/${guildId}/members/${req.user.id}`,
-                method: 'PUT',
-                body: JSON.stringify({
-                    access_token: req.user.accessToken
+                url:     `https://discordapp.com/api/v6/guilds/${guildId}/members/${req.user.id}`,
+                method:  'PUT',
+                body:    JSON.stringify({
+                    access_token: req.user.accessToken,
                 }),
                 headers: {
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
             },
             async (err, resp) => {
-                console.log(application.server_role_id)
+                console.log(application.server_role_id);
                 await app.eris.addGuildMemberRole(guildId, req.user.id, application.server_role_id);
-                res.render('join', {user: req.user, logo, join: !err, application});
-            }
-        )
+                res.render('join', {user: req.user, join: !err, application});
+            },
+        );
     })
     .post('/', auth(), async (req, res) => {
         const form = parse(req.body.toString());
+        const errors = await isValidForm(form);
+        if (Object.keys(errors).length > 0) {
+            return res.render(
+                'index',
+                {
+                    user:      req.user,
+                    submitted: true,
+                    success:   false,
+                    errors,
+                    form,
+                },
+            );
+        }
 
         let posted = false;
         let messageId;
@@ -61,7 +73,9 @@ module.exports = (app) => app
                             {name: 'Invite Code', value: form.invite, inline: true},
                             {name: 'Requester', value: `<@${req.user.id}>`, inline: true},
                         ],
-                        timestamp:   (new Date()).toISOString(),
+                        timestamp:   (
+                                         new Date()
+                                     ).toISOString(),
                     },
                 ],
             }).fire();
@@ -88,8 +102,24 @@ module.exports = (app) => app
                 insert_date:         new Date().toISOString().slice(0, 19).replace('T', ' '),
             });
 
-            res.render('index', {user: req.user, logo, submitted: true, success: true});
+            res.render('index', {user: req.user, submitted: true, success: true});
         } catch (e) {
-            res.render('index', {user: req.user, logo, submitted: true, success: false});
+            res.render('index', {user: req.user, submitted: true, success: false});
         }
     });
+
+async function isValidForm(form) {
+    const errors = {};
+    for (const name of Object.keys(form)) {
+        const value = form[name];
+        if (value.length === 0) {
+            errors[name] = 'This field is required';
+        }
+    }
+
+    if (!errors.invite && !await isValidInvite(form.invite)) {
+        errors.invite = 'This invite is invalid. Must be a complete https://discord.gg link.';
+    }
+
+    return errors;
+}
