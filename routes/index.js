@@ -61,6 +61,22 @@ module.exports = (app) => app
 
         let posted = false;
         let messageId;
+        let serverId;
+
+        try {
+            const invite = await eris.getInvite(form.invite.replace(/https:\/\/discord\.gg\//, ''))
+
+            serverId = invite.guild.id;
+
+            const existingApplication = await database.getApplicationByServerId(serverId)
+            if (existingApplication) {
+                return res.render('index', {user: req.user, submitted: true, success: false, alreadyApplied: true})
+            }
+        } catch (e) {
+            console.error(e)
+        }
+
+
         try {
             const response = await hook.setPayload({
                 username: 'New Application',
@@ -94,16 +110,18 @@ module.exports = (app) => app
             await database.query('INSERT INTO `applications` SET ?', {
                 posted,
                 approval_message_id: messageId,
-                request_user:        req.user.id,
-                server:              form.server,
-                reason:              form.reason,
-                invite_code:         form.invite,
-                votes:               JSON.stringify({}),
-                insert_date:         new Date().toISOString().slice(0, 19).replace('T', ' '),
+                request_user       : req.user.id,
+                server             : form.server,
+                server_id          : serverId,
+                reason             : form.reason,
+                invite_code        : form.invite,
+                votes              : JSON.stringify({}),
+                insert_date        : new Date().toISOString().slice(0, 19).replace('T', ' '),
             });
 
             res.render('index', {user: req.user, submitted: true, success: true});
         } catch (e) {
+            console.log(e)
             res.render('index', {user: req.user, submitted: true, success: false});
         }
     });

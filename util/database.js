@@ -35,4 +35,10 @@ module.exports = {
 
         return results[0];
     },
+    getApplicationByServerId: async (serverId) => {
+        const sql     = 'SELECT * FROM `applications` WHERE `server_id` = ?';
+        const results = await query(sql, [serverId]);
+
+        return results[0];
+    }
 };

@@ -62,8 +62,12 @@
                                             {% else %}
                                                 {% if submitted and not success %}
                                                     <div class="notification is-warning">
-                                                        There is an error with your submission, please correct it, and
+                                                        {% if alreadyApplied %}
+                                                            This server has already been submitted before.
+                                                            {% else %}
+                                                            There is an error with your submission, please correct it, and
                                                         re-submit.
+                                                        {% endif %}
                                                     </div>
                                                 {% endif %}
                                                 <form action="/" method="post">
