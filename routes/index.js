@@ -24,6 +24,10 @@ module.exports = (app) => app
     .post('/:code', auth('guilds.join'), async (req, res) => {
         const application = await database.getApplicationByInviteCode(req.params.code);
 
+        if (!application) {
+            return res.status(404).send('Unknown invite code')
+        }
+
         const guildId = process.secrets.discord.guild_id;
         request(
             {
