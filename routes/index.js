@@ -38,6 +38,7 @@ module.exports = (app) => app
                 }),
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization : eris.token
                 },
             },
             async (err, resp) => {
