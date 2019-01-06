@@ -15,7 +15,7 @@ module.exports = (app) => app
     .get('/', async (req, res) => {
         res.render('index', {user: req.user, form: {}, errors: {}});
     })
-    .get('/favicon.ico', (req, res) => res.send(404))
+    .get('/favicon.ico', (req, res) => res.sendStatus(404))
     .get('/:code', auth('guilds.join'), async (req, res) => {
         const application = await database.getApplicationByInviteCode(req.params.code);
 
