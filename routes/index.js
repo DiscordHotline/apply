@@ -41,8 +41,9 @@ module.exports = (app) => app
             access_token: req.user.accessToken,
         }
 
+        addMemberBody.roles = ["531617261077790720"];
         if (application) {
-            addMemberBody.roles = [application.server_role_id]
+            addMemberBody.roles.push(application.server_role_id);
         }
 
         invite.uses++
