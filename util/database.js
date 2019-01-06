@@ -29,6 +29,22 @@ module.exports = {
         configured = true;
     },
     query,
+    getInvite: async (inviteCode) => {
+        const sql     = 'SELECT * FROM `invites` WHERE `code` = ?';
+        const result = (await query(sql, [inviteCode]))[0];
+
+        if (result && result.useMetadata) {
+            result.useMetadata = JSON.parse(result.useMetadata)
+        }
+
+        return result;
+    },
+    getApplicationById: async (applicationId) => {
+        const sql     = 'SELECT * FROM `applications` WHERE `id` = ?';
+        const results = await query(sql, [applicationId]);
+
+        return results[0];
+    },
     getApplicationByInviteCode: async (code) => {
         const sql     = 'SELECT * FROM `applications` WHERE `hotline_invite_code` = ?';
         const results = await query(sql, [code]);

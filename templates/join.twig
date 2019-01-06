@@ -36,10 +36,16 @@
                                     <div class="content">
                                         <p>Hello {{ user.username }},</p>
                                         {% if join is not defined %}
-                                            <p>
-                                                You have been accepted into the Discord Hotline community as a part of:
-                                            </p>
-                                            <h3 class="is-title is-3 has-text-centered">{{ application.server }}</h3>
+                                            {% if application %}
+                                                <p>
+                                                    You have been accepted into the Discord Hotline community as a part of:
+                                                </p>
+                                                <h3 class="is-title is-3 has-text-centered">{{ application.server }}</h3>
+                                                {% else %}
+                                                <p>
+                                                    You have been accepted into the Discord Hotline community.
+                                                </p>
+                                            {% endif %}
                                             <br />
                                             <p>
                                                 Click the link below, and you will be added to the server. If you are the

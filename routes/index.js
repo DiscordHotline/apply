@@ -17,34 +17,50 @@ module.exports = (app) => app
     })
     .get('/favicon.ico', (req, res) => res.sendStatus(404))
     .get('/:code', auth('guilds.join'), async (req, res) => {
-        const application = await database.getApplicationByInviteCode(req.params.code);
+        const invite = await database.getInvite(req.params.code)
+        const application = (invite && invite.applicationId) ? await database.getApplicationById(invite.applicationId) : null
+
+        if ((!invite && !application) || invite.revoked === 1) {
+            return res.status(404).send('Unknown invite code')
+        }
 
         res.render('join', {user: req.user, application});
     })
     .post('/:code', auth('guilds.join'), async (req, res) => {
-        const application = await database.getApplicationByInviteCode(req.params.code);
+        const invite = await database.getInvite(req.params.code)
+        const application = (invite && invite.applicationId) ? await database.getApplicationById(invite.applicationId) : null
 
-        if (!application) {
+        if (!invite || invite.revoked === 1) {
             return res.status(404).send('Unknown invite code')
+        } if (invite.uses >= invite.maxUses) {
+            return res.status(429).send('This invite has ran out of uses')
         }
 
         const guildId = process.secrets.discord.guild_id;
+        let addMemberBody = {
+            access_token: req.user.accessToken,
+        }
+
+        if (application) {
+            addMemberBody.roles = [application.server_role_id]
+        }
+
+        invite.uses++
+        invite.useMetadata.push({user: req.user.id, usedAt: new Date()})
+        await database.query('UPDATE `applications`.`invites` SET `uses` = ?, `useMetadata` = ? WHERE `id` = ?', [invite.uses, JSON.stringify(invite.useMetadata), invite.id])
+
         request(
             {
                 url:     `https://discordapp.com/api/v6/guilds/${guildId}/members/${req.user.id}`,
                 method:  'PUT',
-                body:    JSON.stringify({
-                    access_token: req.user.accessToken,
-                }),
+                body:    JSON.stringify(addMemberBody),
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization : eris.token
                 },
             },
-            async (err, resp) => {
-                console.log(application.server_role_id);
-                await app.eris.addGuildMemberRole(guildId, req.user.id, application.server_role_id);
-                res.render('join', {user: req.user, join: !err, application});
+            async (err) => {
+                res.render('join', {user: req.user, join: !err});
             },
         );
     })
