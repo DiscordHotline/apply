@@ -1,60 +1,52 @@
-let connection = require('serverless-mysql')();
-let configured = false;
+const {createConnection, getConnectionManager} = require('typeorm');
+const {Entities}         = require('@hotline/application-plugin');
 
-const query = async (sql, values) => connection.query({
-    sql, values, typeCast: function (field, next) {
-        if (field.type === 'LONGLONG') {
-            return field.string();
-        }
-
-        return next();
-    },
-});
+/** @var {Connection} global.connection */
+let connection = null;
 
 module.exports = {
-    initialize:                 async () => {
-        if (configured) {
+    initialize:         async () => {
+        if (connection) {
             return;
         }
         console.log('Initializing Database');
 
-        connection.config({
-            host:     process.secrets.mainDatabase.dsn,
-            user:     process.secrets.database.user,
-            password: process.secrets.database.password,
-            database: process.secrets.database.database,
-            typeCast: false,
-        });
+        const config = {
+            synchronize:       false,
+            host:              process.secrets.mainDatabase.dsn,
+            database:          process.secrets.database.database,
+            port:              3306,
+            username:          process.secrets.database.user,
+            password:          process.secrets.database.password,
+            type:              'mysql',
+            supportBigNumbers: true,
+            bigNumberStrings:  true,
+            entities:          Object.values(Entities),
+        };
 
-        configured = true;
-    },
-    query,
-    getInvite: async (inviteCode) => {
-        const sql     = 'SELECT * FROM `invites` WHERE `code` = ?';
-        const result = (await query(sql, [inviteCode]))[0];
-
-        if (result && result.useMetadata) {
-            result.useMetadata = JSON.parse(result.useMetadata)
+        if (getConnectionManager().has('default')) {
+            await getConnectionManager().get().close();
         }
 
-        return result;
+        connection = await createConnection(config);
     },
-    getApplicationById: async (applicationId) => {
-        const sql     = 'SELECT * FROM `applications` WHERE `id` = ?';
-        const results = await query(sql, [applicationId]);
-
-        return results[0];
+    getGuild:           async (id) => {
+        return connection.getRepository(Entities.Guild).findOne(id);
     },
-    getApplicationByInviteCode: async (code) => {
-        const sql     = 'SELECT * FROM `applications` WHERE `hotline_invite_code` = ?';
-        const results = await query(sql, [code]);
-
-        return results[0];
+    getInvite:          async (code) => {
+        return connection.getRepository(Entities.Invite).findOne({code});
     },
-    getApplicationByServerId: async (serverId) => {
-        const sql     = 'SELECT * FROM `applications` WHERE `server_id` = ?';
-        const results = await query(sql, [serverId]);
+    getApplicationByGuildId: async (guildId) => {
+        try {
+            const qb = connection.createQueryBuilder(Entities.Application, 'a')
+                .innerJoinAndSelect(Entities.Guild, 'g')
+                .where('g.id = :id', {id: guildId});
 
-        return results[0];
+            return await qb.getOne();
+        } catch (e) {
+            console.error(e, e.query);
+
+            throw e;
+        }
     }
 };

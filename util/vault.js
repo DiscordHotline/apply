@@ -1,7 +1,6 @@
 const Vault = require('node-vault');
 
-let vault;
-let initialized = false;
+global.vault = undefined;
 
 async function read(secret, required = true) {
     try {
@@ -21,7 +20,7 @@ async function read(secret, required = true) {
 
 module.exports = {
     initialize: async () => {
-        if (vault !== undefined) {
+        if (!!vault) {
             return vault;
         }
         console.log('Initializing Vault');

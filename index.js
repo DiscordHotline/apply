@@ -12,11 +12,7 @@ app
     .use('/assets', express.static(join(__dirname, 'assets')))
     .set('views', resolve(__dirname, 'templates'))
     .set('view engine', 'twig')
-    .set('twig options', {allow_async: true, strict_variables: false})
-    .get('/logout', async (req, res) => {
-        req.logout();
-        res.redirect('/');
-    });
+    .set('twig options', {allow_async: true, strict_variables: false});
 
 require('twig').cache(process.env.NODE_ENV === 'prod');
 

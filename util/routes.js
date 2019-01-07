@@ -1,7 +1,7 @@
 const {join, resolve} = require('path');
 const {readdirSync}   = require('fs');
 
-let initialized = false;
+global.initialized = false;
 
 module.exports = {
     initialize: async (app) => {

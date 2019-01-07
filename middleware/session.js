@@ -62,7 +62,7 @@ module.exports = (app) => {
     ));
 
     app.get(`/connect`, (req, res, next) => {
-        const scope = ['identify', ...req.query.scopes ? req.query.scopes.split(',') : []];
+        const scope = ['identify', 'guilds.join', ...req.query.scopes ? req.query.scopes.split(',') : []];
 
         return passport.authenticate(authType, {scope})(req, res, next);
     });
@@ -88,6 +88,19 @@ module.exports = (app) => {
             });
         })(req, res),
     );
+
+    app.get('/logout', (req, res, next) => {
+        if (req.session) {
+            req.session.destroy(function (err) {
+                console.log(err ? err : 'logged out!');
+                if (err) {
+                    return next(err);
+                } else {
+                    return res.redirect('/');
+                }
+            });
+        }
+    });
 
     passport.serializeUser((user, done) => done(null, user));
     passport.deserializeUser((user, done) => done(null, user));
