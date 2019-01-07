@@ -42,22 +42,27 @@ const addUserToGuild = (user, roles) => new Promise((resolve, reject) => {
                 // Remove applicant role, if its there.
                 await eris.removeGuildMemberRole(hotlineGuildId, user.id, '531713467619475456');
             } finally {
-                const created = (user.id / 4194304) + 1420070400000;
+                const created = (
+                                    user.id / 4194304
+                                ) + 1420070400000;
                 await eris.createMessage(
                     process.secrets.apply.welcome_channel,
                     {
                         content: `Welcome <@${user.id}>!`,
-                        embed: {
-                            title: `New User: ${user.username}#${user.discriminator}`,
-                            fields: [
+                        embed:   {
+                            title:     `New User: ${user.username}#${user.discriminator}`,
+                            fields:    [
                                 {name: '**ID:**', value: user.id},
                                 {name: '**Created On:**', value: new Date(created).toISOString()},
                             ],
                             thumbnail: {
-                                url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                            }
-                        }
-                    }
+                                url:
+                                    user.avatar
+                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+                            },
+                        },
+                    },
                 );
 
                 resolve();
