@@ -10,7 +10,7 @@ const auth          = require('../middleware/authentication');
 const hook = new Hook();
 hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
 
-const addUserToGuild = (user, roles) => new Promise((resolve, reject) => {
+const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve, reject) => {
     const hotlineGuildId = process.secrets.discord.guild_id;
     const body           = {access_token: user.accessToken};
     if (roles) {
@@ -38,35 +38,36 @@ const addUserToGuild = (user, roles) => new Promise((resolve, reject) => {
             const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
 
             await Promise.all(promises);
-            try {
-                // Remove applicant role, if its there.
-                await eris.removeGuildMemberRole(hotlineGuildId, user.id, '531713467619475456');
-            } finally {
-                const created = (
-                                    user.id / 4194304
-                                ) + 1420070400000;
-                await eris.createMessage(
-                    process.secrets.apply.welcome_channel,
-                    {
-                        content: `Welcome <@${user.id}>!`,
-                        embed:   {
-                            title:     `New User: ${user.username}#${user.discriminator}`,
-                            fields:    [
-                                {name: '**ID:**', value: user.id},
-                                {name: '**Created On:**', value: new Date(created).toISOString()},
-                            ],
-                            thumbnail: {
-                                url:
-                                    user.avatar
-                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+            if (!applicant) {
+                try {
+                    // Remove applicant role, if its there.
+                    await eris.removeGuildMemberRole(hotlineGuildId, user.id, '531713467619475456');
+                } finally {
+                    const created = user.id / 4194304 + 1420070400000;
+                    const role = `<@&${roles[roles.length - 1]}>`;
+                    await eris.createMessage(
+                        process.secrets.apply.welcome_channel,
+                        {
+                            content: `Welcome <@${user.id}>, from ${role}!`,
+                            embed:   {
+                                title:     `New User: ${user.username}#${user.discriminator}`,
+                                fields:    [
+                                    {name: '**ID:**', value: user.id},
+                                    {name: '**Created On:**', value: new Date(created).toISOString()},
+                                ],
+                                thumbnail: {
+                                    url:
+                                        user.avatar
+                                        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                                        : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+                                },
                             },
                         },
-                    },
-                );
-
-                resolve();
+                    );
+                }
             }
+
+            resolve();
         },
     );
 });
