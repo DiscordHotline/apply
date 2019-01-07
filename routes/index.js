@@ -46,6 +46,7 @@ const addUserToGuild = (user, roles) => new Promise((resolve, reject) => {
                 await eris.createMessage(
                     process.secrets.apply.welcome_channel,
                     {
+                        content: `Welcome <@${user.id}>!`,
                         embed: {
                             title: `New User: ${user.username}#${user.discriminator}`,
                             fields: [
