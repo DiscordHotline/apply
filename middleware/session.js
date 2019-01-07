@@ -4,7 +4,7 @@ const request        = require('request');
 const OAuth2Strategy = require('passport-oauth2').Strategy;
 const DynamoDBStore  = require('connect-dynamodb')({session});
 
-const cookie = {maxAge: 1000 * 60 * 60 * 24 * 30 * 3};
+const cookie = {maxAge: 1000 * 60 * 60 * 1};
 if (process.env.NODE_ENV === 'prod') {
     cookie.domain = '.hotline.gg';
     cookie.secure = true;
@@ -17,7 +17,7 @@ module.exports = (app) => {
         secret:            '9a7sd79asrh99a9',
         saveUninitialized: true,
         resave:            false,
-        rolling:           true,
+        rolling:           false,
         cookie,
         store,
     }));

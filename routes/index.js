@@ -45,24 +45,25 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
                 } finally {
                     const created = user.id / 4194304 + 1420070400000;
                     const role = `<@&${roles[roles.length - 1]}>`;
-                    await eris.createMessage(
-                        process.secrets.apply.welcome_channel,
-                        {
-                            content: `Welcome <@${user.id}>, from ${role}!`,
-                            embed:   {
-                                title:     `New User: ${user.username}#${user.discriminator}`,
-                                fields:    [
-                                    {name: '**ID:**', value: user.id},
-                                    {name: '**Created On:**', value: new Date(created).toISOString()},
-                                ],
-                                thumbnail: {
-                                    url:
-                                        user.avatar
-                                        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                                        : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
-                                },
+                    const message = {
+                        content: `Welcome <@${user.id}>, from ${role}!`,
+                        embed:   {
+                            title:     `New User: ${user.username}#${user.discriminator}`,
+                            fields:    [
+                                {name: '**ID:**', value: user.id},
+                                {name: '**Created On:**', value: new Date(created).toISOString()},
+                            ],
+                            thumbnail: {
+                                url:
+                                    user.avatar
+                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
                             },
                         },
+                    };
+                    await eris.createMessage(
+                        process.secrets.apply.welcome_channel,
+                        message,
                     );
                 }
             }
