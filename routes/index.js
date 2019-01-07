@@ -10,17 +10,17 @@ const auth          = require('../middleware/authentication');
 const hook = new Hook();
 hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
 
-const addUserToGuild = (userId, accessToken, roles) => new Promise((resolve, reject) => {
+const addUserToGuild = (user, roles) => new Promise((resolve, reject) => {
     const hotlineGuildId = process.secrets.discord.guild_id;
-    const body           = {access_token: accessToken};
+    const body           = {access_token: user.accessToken};
     if (roles) {
         body.roles = roles;
     }
 
-    console.log(`Adding ${userId} to ${hotlineGuildId} with roles: ${JSON.stringify(body.roles)}`);
+    console.log(`Adding ${user.id} to ${hotlineGuildId} with roles: ${JSON.stringify(body.roles)}`);
     request(
         {
-            url:     `https://discordapp.com/api/v6/guilds/${hotlineGuildId}/members/${userId}`,
+            url:     `https://discordapp.com/api/v6/guilds/${hotlineGuildId}/members/${user.id}`,
             method:  'PUT',
             body:    JSON.stringify(body),
             headers: {
@@ -35,13 +35,30 @@ const addUserToGuild = (userId, accessToken, roles) => new Promise((resolve, rej
 
             // If the user is already in the server, it doesnt add the roles...
             // SMFH - Aaron
-            const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, userId, role));
+            const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
 
             await Promise.all(promises);
             try {
                 // Remove applicant role, if its there.
-                await eris.removeGuildMemberRole(hotlineGuildId, userId, '531713467619475456');
+                await eris.removeGuildMemberRole(hotlineGuildId, user.id, '531713467619475456');
             } finally {
+                const created = (user.id / 4194304) + 1420070400000;
+                await eris.createMessage(
+                    process.secrets.apply.welcome_channel,
+                    {
+                        embed: {
+                            title: `New User: ${user.username}#${user.discriminator}`,
+                            fields: [
+                                {name: '**ID:**', value: user.id},
+                                {name: '**Created On:**', value: new Date(created).toISOString()},
+                            ],
+                            thumbnail: {
+                                url: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                            }
+                        }
+                    }
+                );
+
                 resolve();
             }
         },
@@ -89,7 +106,7 @@ module.exports = (app) => app
         }
 
         try {
-            await addUserToGuild(req.user.id, req.user.accessToken, roles);
+            await addUserToGuild(req.user, roles);
             res.render('join', {user: req.user, join: true});
         } catch (e) {
             console.error(e);
@@ -182,7 +199,7 @@ module.exports = (app) => app
 
             // Add user to the Hotline guild as an Applicant (role id below)
             try {
-                await addUserToGuild(req.user.id, req.user.accessToken, ['531713467619475456']);
+                await addUserToGuild(req.user, ['531713467619475456']);
             } finally {
                 res.render('index', {user: req.user, submitted: true, success: true});
             }
