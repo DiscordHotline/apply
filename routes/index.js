@@ -187,7 +187,7 @@ module.exports = (app) => app
         try {
             if (!guild) {
                 guild         = new Entities.Guild();
-                guild.id      = serverId;
+                guild.guildId = serverId;
                 guild.members = [];
                 guild.owners  = [];
                 guild.name    = form.server;
