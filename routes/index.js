@@ -10,6 +10,9 @@ const auth          = require('../middleware/authentication');
 const hook = new Hook();
 hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
 
+// TODO: Move this variable to a better place like a config or something?
+const applicantRole = '531713467619475456'
+
 const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve, reject) => {
     const hotlineGuildId = process.secrets.discord.guild_id;
     const body           = {access_token: user.accessToken};
@@ -41,30 +44,34 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
             if (!applicant) {
                 try {
                     // Remove applicant role, if its there.
-                    await eris.removeGuildMemberRole(hotlineGuildId, user.id, '531713467619475456');
+                    await eris.removeGuildMemberRole(hotlineGuildId, user.id, applicantRole);
                 } finally {
-                    const created = user.id / 4194304 + 1420070400000;
-                    const role = `<@&${roles[roles.length - 1]}>`;
-                    const message = {
-                        content: `Welcome <@${user.id}>, from ${role}!`,
-                        embed:   {
-                            title:     `New User: ${user.username}#${user.discriminator}`,
-                            fields:    [
-                                {name: '**ID:**', value: user.id},
-                                {name: '**Created On:**', value: new Date(created).toISOString()},
-                            ],
-                            thumbnail: {
-                                url:
-                                    user.avatar
-                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+                    const guildRole = roles[roles.length - 1]
+
+                    if (guildRole !== applicantRole) {
+                        const created = user.id / 4194304 + 1420070400000;
+                        const role = `<@&${guildRole}>`;
+                        const message = {
+                            content: `Welcome <@${user.id}>, from ${role}!`,
+                            embed:   {
+                                title:     `New User: ${user.username}#${user.discriminator}`,
+                                fields:    [
+                                    {name: '**ID:**', value: user.id},
+                                    {name: '**Created On:**', value: new Date(created).toISOString()},
+                                ],
+                                thumbnail: {
+                                    url:
+                                        user.avatar
+                                        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                                        : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+                                },
                             },
-                        },
-                    };
-                    await eris.createMessage(
-                        process.secrets.apply.welcome_channel,
-                        message,
-                    );
+                        };
+                        await eris.createMessage(
+                            process.secrets.apply.welcome_channel,
+                            message,
+                        );
+                    }
                 }
             }
 
@@ -207,7 +214,7 @@ module.exports = (app) => app
 
             // Add user to the Hotline guild as an Applicant (role id below)
             try {
-                await addUserToGuild(req.user, ['531713467619475456']);
+                await addUserToGuild(req.user, [applicantRole]);
             } finally {
                 res.render('index', {user: req.user, submitted: true, success: true});
             }
