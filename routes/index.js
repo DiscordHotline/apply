@@ -198,7 +198,7 @@ module.exports = (app) => app
                 guild.members = [];
                 guild.owners  = [];
                 guild.name    = form.server;
-                await guild.save()
+                guild = await guild.save();
             }
 
             const application             = new Entities.Application();
