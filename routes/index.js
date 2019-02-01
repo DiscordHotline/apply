@@ -210,8 +210,9 @@ module.exports = (app) => app
             application.votes             = {};
             application.insertDate        = new Date();
             application.guild             = guild.id;
+            console.log(guild)
             await application.save();
-
+            console.log(application)
             // Add user to the Hotline guild as an Applicant (role id below)
             try {
                 await addUserToGuild(req.user, [applicantRole]);
