@@ -1,7 +1,8 @@
-const {parse}    = require('querystring');
-const {Hook}     = require('hookcord');
-const request    = require('request');
-const {Entities} = require('@hotline/application-plugin');
+const {parse}       = require('querystring');
+const {Hook}        = require('hookcord');
+const request       = require('request');
+const {Entities}    = require('@hotline/application-plugin');
+const erisEndpoints = require('eris/lib/rest/Endpoints')
 
 const isValidInvite = require('../util/isValidInvite');
 const database      = require('../util/database');
@@ -10,8 +11,9 @@ const auth          = require('../middleware/authentication');
 const hook = new Hook();
 hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
 
-// TODO: Move this variable to a better place like a config or something?
-const applicantRole = '531713467619475456'
+// TODO: Move this to vault
+const applicantRole  = '531713467619475456'
+const hotlineGuildId = '204100839806205953'
 
 const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve, reject) => {
     const hotlineGuildId = process.secrets.discord.guild_id;
@@ -107,18 +109,32 @@ module.exports = (app) => app
         guild.members = [...new Set(guild.members)];
         await guild.save();
 
+        // Increment use count
+        invite.uses++;
+        invite.useMetadata.push({user: req.user.id, usedAt: new Date()});
+        await invite.save();
+
+        // Check if user is already in hotline
+        let existingMember
+        try {
+            existingMember = await eris.getRESTGuildMember(hotlineGuildId, req.user.id)
+        } catch (_) {}
+
+        if (existingMember) {
+            if (!existingMember.roles.includes(guild.roleId)) {
+                await eris.requestHandler.request("PUT", erisEndpoints.GUILD_MEMBER_ROLE(hotlineGuildId, req.user.id, guild.roleId), true)
+                console.log(`Skipped adding ${req.user.id} from ${guild.id} and only added the guild role.`)
+            }
+            
+            return res.render('join', {user: req.user, join: true})
+        }
+
         // Add the Member Role
         let roles = ['531617261077790720'];
         if (guild && guild.roleId) {
             roles.push(guild.roleId);
         }
         roles = [...new Set(roles)];
-
-        if (invite.useMetadata.findIndex((x) => x.user === req.user.id) === -1) {
-            invite.uses++;
-            invite.useMetadata.push({user: req.user.id, usedAt: new Date()});
-            await invite.save();
-        }
 
         try {
             await addUserToGuild(req.user, roles);
