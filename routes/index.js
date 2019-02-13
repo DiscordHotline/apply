@@ -1,7 +1,8 @@
-const {parse}    = require('querystring');
-const {Hook}     = require('hookcord');
-const request    = require('request');
-const {Entities} = require('@hotline/application-plugin');
+const {parse}       = require('querystring');
+const {Hook}        = require('hookcord');
+const request       = require('request');
+const {Entities}    = require('@hotline/application-plugin');
+const erisEndpoints = require('eris/lib/rest/Endpoints')
 
 const isValidInvite = require('../util/isValidInvite');
 const database      = require('../util/database');
@@ -9,6 +10,10 @@ const auth          = require('../middleware/authentication');
 
 const hook = new Hook();
 hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
+
+// TODO: Move this to vault
+const applicantRole  = '531713467619475456'
+const hotlineGuildId = '204100839806205953'
 
 const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve, reject) => {
     const hotlineGuildId = process.secrets.discord.guild_id;
@@ -28,43 +33,52 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
                 Authorization:  eris.token,
             },
         },
-        async (err) => {
+        async (err, resp) => {
+            console.log('Response from GUILD_MEMBER_ADD: ', resp);
             if (err) {
                 return reject(err);
             }
 
             // If the user is already in the server, it doesnt add the roles...
             // SMFH - Aaron
-            const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
+            try {
+                const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
 
-            await Promise.all(promises);
+                await Promise.all(promises);
+            } catch (e) {
+                console.log('Failed adding roles to user: ', e);
+            }
             if (!applicant) {
                 try {
                     // Remove applicant role, if its there.
-                    await eris.removeGuildMemberRole(hotlineGuildId, user.id, '531713467619475456');
+                    await eris.removeGuildMemberRole(hotlineGuildId, user.id, applicantRole);
                 } finally {
-                    const created = user.id / 4194304 + 1420070400000;
-                    const role = `<@&${roles[roles.length - 1]}>`;
-                    const message = {
-                        content: `Welcome <@${user.id}>, from ${role}!`,
-                        embed:   {
-                            title:     `New User: ${user.username}#${user.discriminator}`,
-                            fields:    [
-                                {name: '**ID:**', value: user.id},
-                                {name: '**Created On:**', value: new Date(created).toISOString()},
-                            ],
-                            thumbnail: {
-                                url:
-                                    user.avatar
-                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp`
-                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.webp`,
+                    const guildRole = roles[roles.length - 1]
+
+                    if (guildRole !== applicantRole) {
+                        const created = user.id / 4194304 + 1420070400000;
+                        const role = `<@&${guildRole}>`;
+                        const message = {
+                            content: `Welcome <@${user.id}>, from ${role}!`,
+                            embed:   {
+                                title:     `New User: ${user.username}#${user.discriminator}`,
+                                fields:    [
+                                    {name: '**ID:**', value: user.id},
+                                    {name: '**Created On:**', value: new Date(created).toISOString()},
+                                ],
+                                thumbnail: {
+                                    url:
+                                        user.avatar
+                                        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                                        : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+                                },
                             },
-                        },
-                    };
-                    await eris.createMessage(
-                        process.secrets.apply.welcome_channel,
-                        message,
-                    );
+                        };
+                        await eris.createMessage(
+                            process.secrets.apply.welcome_channel,
+                            message,
+                        );
+                    }
                 }
             }
 
@@ -100,18 +114,32 @@ module.exports = (app) => app
         guild.members = [...new Set(guild.members)];
         await guild.save();
 
+        // Increment use count
+        invite.uses++;
+        invite.useMetadata.push({user: req.user.id, usedAt: new Date()});
+        await invite.save();
+
+        // Check if user is already in hotline
+        let existingMember
+        try {
+            existingMember = await eris.getRESTGuildMember(hotlineGuildId, req.user.id)
+        } catch (_) {}
+
+        if (existingMember) {
+            if (!existingMember.roles.includes(guild.roleId)) {
+                await eris.requestHandler.request("PUT", erisEndpoints.GUILD_MEMBER_ROLE(hotlineGuildId, req.user.id, guild.roleId), true)
+                console.log(`Skipped adding ${req.user.id} from ${guild.id} and only added the guild role.`)
+            }
+            
+            return res.render('join', {user: req.user, join: true})
+        }
+
         // Add the Member Role
         let roles = ['531617261077790720'];
         if (guild && guild.roleId) {
             roles.push(guild.roleId);
         }
         roles = [...new Set(roles)];
-
-        if (invite.useMetadata.findIndex((x) => x.user === req.user.id) === -1) {
-            invite.uses++;
-            invite.useMetadata.push({user: req.user.id, usedAt: new Date()});
-            await invite.save();
-        }
 
         try {
             await addUserToGuild(req.user, roles);
@@ -187,7 +215,7 @@ module.exports = (app) => app
         try {
             if (!guild) {
                 guild         = new Entities.Guild();
-                guild.id      = serverId;
+                guild.guildId = serverId;
                 guild.members = [];
                 guild.owners  = [];
                 guild.name    = form.server;
@@ -204,10 +232,9 @@ module.exports = (app) => app
             application.insertDate        = new Date();
             application.guild             = guild.id;
             await application.save();
-
             // Add user to the Hotline guild as an Applicant (role id below)
             try {
-                await addUserToGuild(req.user, ['531713467619475456']);
+                await addUserToGuild(req.user, [applicantRole]);
             } finally {
                 res.render('index', {user: req.user, submitted: true, success: true});
             }
