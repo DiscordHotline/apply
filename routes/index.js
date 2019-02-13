@@ -56,8 +56,8 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
                             thumbnail: {
                                 url:
                                     user.avatar
-                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+                                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.webp`
+                                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.webp`,
                             },
                         },
                     };
