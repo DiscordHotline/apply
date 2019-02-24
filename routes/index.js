@@ -99,9 +99,10 @@ module.exports = (app) => app
         const invite = await database.getInvite(req.params.code);
         if (!invite || invite.revoked) {
             return res.status(404).send('Unknown invite code');
-        }
-        if (invite.uses >= invite.maxUses) {
-            return res.status(429).send('This invite has ran out of uses');
+        } if (invite.uses >= invite.maxUses) {
+            return res.status(410).send('This invite has ran out of uses');
+        } if (invite.expiresAt && (Date.now() > invite.expiresAt)) {
+            return res.status(410).send('Invite has expired')
         }
 
         const guild = invite.guild;
