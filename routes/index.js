@@ -13,7 +13,37 @@ hook.setOptions({link: process.secrets.apply.webhook_url + '?wait=true'});
 
 // TODO: Move this to vault
 const applicantRole  = '531713467619475456'
+const memberRole     = '531617261077790720'
 const hotlineGuildId = '204100839806205953'
+
+const manageMemberRole = async (memberId, roleId, addRole = true) => {
+    return eris.requestHandler.request(addRole ? 'PUT' : 'DELETE', erisEndpoints.GUILD_MEMBER_ROLE(hotlineGuildId, memberId, roleId), true)
+}
+
+const welcomeMember = async (user, guildRole) => {
+    const created = user.id / 4194304 + 1420070400000;
+    const role = `<@&${guildRole}>`;
+    const message = {
+        content: `Welcome <@${user.id}>, from ${role}!`,
+        embed:   {
+            title:     `New User: ${user.username}#${user.discriminator}`,
+            fields:    [
+                {name: '**ID:**', value: user.id},
+                {name: '**Created On:**', value: new Date(created).toISOString()},
+            ],
+            thumbnail: {
+                url:
+                    user.avatar
+                    ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
+                    : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
+            },
+        },
+    };
+    await eris.createMessage(
+        process.secrets.apply.welcome_channel,
+        message,
+    );
+}
 
 const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve, reject) => {
     const hotlineGuildId = process.secrets.discord.guild_id;
@@ -56,28 +86,7 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
                     const guildRole = roles[roles.length - 1]
 
                     if (guildRole !== applicantRole) {
-                        const created = user.id / 4194304 + 1420070400000;
-                        const role = `<@&${guildRole}>`;
-                        const message = {
-                            content: `Welcome <@${user.id}>, from ${role}!`,
-                            embed:   {
-                                title:     `New User: ${user.username}#${user.discriminator}`,
-                                fields:    [
-                                    {name: '**ID:**', value: user.id},
-                                    {name: '**Created On:**', value: new Date(created).toISOString()},
-                                ],
-                                thumbnail: {
-                                    url:
-                                        user.avatar
-                                        ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`
-                                        : `https://discordapp.com/assets/6debd47ed13483642cf09e832ed0bc1b.png`,
-                                },
-                            },
-                        };
-                        await eris.createMessage(
-                            process.secrets.apply.welcome_channel,
-                            message,
-                        );
+                        await welcomeMember(user, guildRole)
                     }
                 }
             }
@@ -127,8 +136,20 @@ module.exports = (app) => app
         } catch (_) {}
 
         if (existingMember) {
+            // Check if member doesn't have the member role
+            if (!existingMember.roles.includes(memberRole)) {
+                await manageMemberRole(req.user.id, memberRole, true)
+            }
+
+            // Check if member has applicant role
+            if (existingMember.roles.include(applicantRole)) {
+                await manageMemberRole(req.user.id, applicantRole, false)
+                await welcomeMember(req.user, guild.roleId)
+            }
+
+            // Check if member only doesn't have the guild role
             if (!existingMember.roles.includes(guild.roleId)) {
-                await eris.requestHandler.request("PUT", erisEndpoints.GUILD_MEMBER_ROLE(hotlineGuildId, req.user.id, guild.roleId), true)
+                await manageMemberRole(req.user.id, guild.roleId, true)
                 console.log(`Skipped adding ${req.user.id} from ${guild.id} and only added the guild role.`)
             }
             
