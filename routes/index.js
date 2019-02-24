@@ -69,8 +69,6 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
                 return reject(err);
             }
 
-            // If the user is already in the server, it doesnt add the roles...
-            // SMFH - Aaron
             try {
                 const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
 
