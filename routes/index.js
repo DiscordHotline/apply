@@ -33,16 +33,21 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
                 Authorization:  eris.token,
             },
         },
-        async (err) => {
+        async (err, resp) => {
+            console.log('Response from GUILD_MEMBER_ADD: ', resp);
             if (err) {
                 return reject(err);
             }
 
             // If the user is already in the server, it doesnt add the roles...
             // SMFH - Aaron
-            const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
+            try {
+                const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
 
-            await Promise.all(promises);
+                await Promise.all(promises);
+            } catch (e) {
+                console.log('Failed adding roles to user: ', e);
+            }
             if (!applicant) {
                 try {
                     // Remove applicant role, if its there.
