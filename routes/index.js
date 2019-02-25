@@ -140,7 +140,7 @@ module.exports = (app) => app
             }
 
             // Check if member has applicant role
-            if (existingMember.roles.include(applicantRole)) {
+            if (existingMember.roles.includes(applicantRole)) {
                 await manageMemberRole(req.user.id, applicantRole, false)
                 await welcomeMember(req.user, guild.roleId)
             }
