@@ -122,8 +122,7 @@ module.exports = (app) => app
         guild.members = [...new Set(guild.members)];
         await guild.save();
 
-        // Increment use count
-        invite.uses++;
+        // Add join attempt to invite
         invite.useMetadata.push({user: req.user.id, usedAt: new Date()});
         await invite.save();
 
@@ -151,6 +150,8 @@ module.exports = (app) => app
                 console.log(`Skipped adding ${req.user.id} from ${guild.id} and only added the guild role.`)
             }
             
+            invite.uses++
+            await invite.save()
             return res.render('join', {user: req.user, join: true})
         }
 
@@ -163,6 +164,8 @@ module.exports = (app) => app
 
         try {
             await addUserToGuild(req.user, roles);
+            invite.uses++
+            await invite.save()
             res.render('join', {user: req.user, join: true});
         } catch (e) {
             console.error(e);
