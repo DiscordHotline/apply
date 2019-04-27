@@ -76,7 +76,7 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
             } catch (e) {
                 console.log('Failed adding roles to user: ', e);
             }
-            if (!applicant) {
+            if (!applicant && !roles.includes(applicantRole)) {
                 try {
                     // Remove applicant role, if its there.
                     await eris.removeGuildMemberRole(hotlineGuildId, user.id, applicantRole);
