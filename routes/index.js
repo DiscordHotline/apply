@@ -166,7 +166,23 @@ module.exports = (app) => app
             res.render('join', {user: req.user, join: true});
         } catch (e) {
             console.error(e);
-            res.render('join', {user: req.user, join: false});
+
+            let errorReason
+            switch (e.code) {
+                case 30001: {
+                    errorReason = 'Maximum number of guilds reached (100)'
+                    console.log(`${req.user} attempted to join Hotline while being at their guild limit`)
+                    break
+                }
+
+                case 50025: {
+                    errorReason = 'Relog and try again'
+                    console.log(`${req.user} attempted to join Hotline while their access token is invalid`)
+                    break
+                }
+            }
+
+            res.render('join', {user: req.user, join: false, errorReason});
         }
 
     })

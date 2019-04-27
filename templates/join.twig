@@ -64,10 +64,21 @@
                                                     You have been successfully added to the community! You can close this window.
                                                 </p>
                                             {% else %}
-                                                <p>
-                                                    We could not add you at this time. Please contact the person who sent you this link
-                                                    or a Discord Hotline administrator to get this sorted.
-                                                </p>
+                                                {% if errorReason %}
+                                                    <p>
+                                                        We could not add you at this time for the following reason: <h3>{{ errorReason }}</h3>
+                                                    </p>
+                                                    <br>
+                                                    <p>
+                                                        Please contact the person who sent you this or a Discord Hotline administrator 
+                                                        if you continue having issues to get this sorted.
+                                                    </p>
+                                                {% else %}
+                                                    <p>
+                                                        We could not add you at this time. Please contact the person who sent you this link
+                                                        or a Discord Hotline administrator to get this sorted.
+                                                    </p>
+                                                {% endif %}}
                                             {% endif %}
                                         {% endif %}
                                     </div>
