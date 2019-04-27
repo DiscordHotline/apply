@@ -23,9 +23,14 @@ module.exports = {
             bigNumberStrings:  true,
             entities:          Object.values(Entities),
         };
+        
+        console.log(process.secrets.mainDatabase.dsn)
+        console.log(process.secrets.database)
 
         if (getConnectionManager().has('default')) {
-            await getConnectionManager().get().close();
+            try {
+             await getConnectionManager().get().close();
+            } catch (e) {}
         }
 
         connection = await createConnection(config);
