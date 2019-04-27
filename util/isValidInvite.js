@@ -11,6 +11,7 @@ module.exports = async (invite) => {
 
         return true;
     } catch (e) {
+        console.error(`Failed to fetch invite code "${invite}"`, e)
         return false;
     }
 };
