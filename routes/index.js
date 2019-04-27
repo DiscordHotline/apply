@@ -65,8 +65,8 @@ const addUserToGuild = (user, roles, applicant = false) => new Promise((resolve,
         },
         async (err, resp) => {
             console.log('Response from GUILD_MEMBER_ADD: ', resp);
-            if (err) {
-                return reject(err);
+            if (err || ![201, 204].includes(resp.statusCode)) {
+                return reject(new Error(resp.body));
             }
 
             try {
