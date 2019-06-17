@@ -3,7 +3,7 @@ const {readdirSync}   = require('fs');
 
 global.initialized = false;
 
-module.exports = {
+export default {
     initialize: async (app) => {
         if (initialized) {
             return;

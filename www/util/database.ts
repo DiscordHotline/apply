@@ -4,7 +4,7 @@ const {Entities}         = require('@hotline/application-plugin');
 /** @var {Connection} global.connection */
 let connection = null;
 
-module.exports = {
+export default {
     initialize:         async () => {
         if (connection) {
             return;

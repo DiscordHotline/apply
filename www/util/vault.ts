@@ -1,4 +1,5 @@
-const Vault = require('node-vault');
+const {Manager} = require('@secretary/core');
+const {Adapter} = require('@secretary/aws-secrets-manager-adapter');
 
 global.vault = undefined;
 
@@ -18,7 +19,7 @@ async function read(secret, required = true) {
     }
 }
 
-module.exports = {
+export default {
     initialize: async () => {
         if (!!vault) {
             return vault;

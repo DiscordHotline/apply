@@ -1,2 +1,4 @@
-.serverless
+.next
 node_modules
+.env
+.terraform

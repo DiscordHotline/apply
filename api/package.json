@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "@hotline/application-plugin": "^1.30.1",
+    "@now/node": "^0.7.4-canary.11",
+    "@secretary/aws-secrets-manager-adapter": "^2.0.0-alpha.6",
+    "@secretary/core": "^2.0.0-alpha.3",
+    "aws-sdk": "^2.476.0",
+    "cookie-session": "^1.3.3",
+    "eris": "^0.10.0",
+    "hookcord": "^2.0.1",
+    "micro": "^9.3.4",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "typeorm": "^0.2.18"
+  },
+  "devDependencies": {
+    "@types/cookie-session": "^2.0.37",
+    "@types/micro": "^7.3.3",
+    "@types/node": "^12.0.8",
+    "@types/node-fetch": "^2.3.7",
+    "@types/request": "^2.48.1",
+    "@types/request-promise": "^4.1.44"
+  }
+}

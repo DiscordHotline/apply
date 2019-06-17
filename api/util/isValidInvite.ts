@@ -1,6 +1,10 @@
+import useEris from '../hooks/useEris';
+
 const re       = /https:\/\/discord\.gg\//
 
-module.exports = async (invite) => {
+export default async (invite) => {
+    const eris = await useEris();
+
     if (!re.test(invite)) {
         return false;
     }
@@ -11,7 +15,7 @@ module.exports = async (invite) => {
 
         return true;
     } catch (e) {
-        console.error(`Failed to fetch invite code "${invite}"`, e)
+        console.error(`Failed to fetch invite code "${invite}"`, e);
         return false;
     }
 };

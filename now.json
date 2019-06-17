@@ -1,0 +1,69 @@
+{
+    "version": 2,
+    "name":    "apply",
+    "alias":   [
+        "apply.hotline.gg",
+        "hotline.gg",
+        "www.hotline.gg"
+    ],
+    "builds":  [
+        {
+            "src": "api/routes/*.ts",
+            "use": "@now/node@canary"
+        },
+        {
+            "src": "www/package.json",
+            "use": "@now/next@canary"
+        }
+    ],
+    "regions": ["all"],
+    "env":     {
+        "SM_AWS_ACCESS_KEY_ID":     "@apply_aws_access_key_id",
+        "SM_AWS_SECRET_ACCESS_KEY": "@apply_aws_secret_access_key"
+    },
+    "routes":  [
+        {
+            "src":  "/favicon.ico",
+            "status": 404
+        },
+        {
+            "src":     "/logout",
+            "dest":    "/api/routes/logout.ts",
+            "methods": ["GET"]
+        },
+        {
+            "src":     "/session",
+            "dest":    "/api/routes/session.ts",
+            "methods": ["GET"]
+        },
+        {
+            "src":     "/connect",
+            "dest":    "/api/routes/connect.ts",
+            "methods": ["GET"]
+        },
+        {
+            "src":     "/connect/callback",
+            "dest":    "/api/routes/connectCallback.ts",
+            "methods": ["GET"]
+        },
+        {
+            "src":     "/(?<code>[^/]*)",
+            "methods": ["POST"],
+            "dest":    "/api/routes/invite.ts?code=$code"
+        },
+        {
+            "src":     "/",
+            "dest":    "/api/routes/submit.ts",
+            "methods": ["POST"]
+        },
+        {
+            "src":     "/(?<code>[^/]*)",
+            "methods": ["GET"],
+            "dest":    "/www/index?code=$code"
+        },
+        {
+            "src":     "/",
+            "dest":    "/www/index"
+        }
+    ]
+}

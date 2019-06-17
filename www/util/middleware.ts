@@ -2,7 +2,7 @@ const Eris = require('eris');
 
 let initialized = false;
 
-module.exports = {
+export default {
     initialize: async (app) => {
         if (initialized) {
             return;
