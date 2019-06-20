@@ -1,6 +1,7 @@
 import {Entities} from '@hotline/application-plugin';
 import {NowRequest, NowResponse} from '@now/node';
 import {createError, json} from 'micro';
+import withErrors from '../hocs/withErrors';
 
 import useAuthentication from '../hooks/useAuthentication';
 import useDatabase from '../hooks/useDatabase';
@@ -27,20 +28,20 @@ async function isValidForm(form) {
     }
 
     if (!errors.invite && !await isValidInvite(form.invite)) {
-        errors.invite = 'This invite is invalid. Must be a complete https://discord.gg link.';
+        errors.invite = 'This invite is invalid. Must be a valid invite code.';
     }
 
     return errors;
 }
 
-export default async (req: NowRequest, res: NowResponse) => {
+export default withErrors(async (req: NowRequest, res: NowResponse) => {
     const [user]   = await useAuthentication(req, res);
     const eris     = await useEris();
     const form: Form = await json(req);
 
     const errors = await isValidForm(form);
     if (Object.keys(errors).length > 0) {
-        return res.status(400).send({errors});
+        return res.status(400).send({errors, alreadyApplied: false, success: false});
     }
 
     const {getGuild} = await useDatabase();
@@ -51,12 +52,12 @@ export default async (req: NowRequest, res: NowResponse) => {
     let guild;
 
     try {
-        const invite = await eris.getInvite(form.invite.replace(/https:\/\/discord\.gg\//, ''));
+        const invite = await eris.getInvite(form.invite);
 
         serverId = invite.guild.id;
         guild    = await getGuild(serverId);
-        if (guild && guild.application) {
-            return res.status(409).json({alreadyApplied: true});
+        if (guild) {
+            return res.status(409).json({alreadyApplied: true, success: false});
         }
     } catch (e) {
         throw createError(400, 'Error fetching invite.', e);
@@ -76,9 +77,7 @@ export default async (req: NowRequest, res: NowResponse) => {
                         {name: 'Invite Code', value: form.invite, inline: true},
                         {name: 'Requester', value: `<@${user.id}>`, inline: true},
                     ],
-                    timestamp:   (
-                                     new Date()
-                                 ).toISOString(),
+                    timestamp:   new Date().toISOString(),
                 },
             ],
         }).fire();
@@ -117,9 +116,9 @@ export default async (req: NowRequest, res: NowResponse) => {
         try {
             await addUserToGuild(user, [applicantRole]);
         } finally {
-            return res.status(204).send(null);
+            res.status(200).send({alreadyApplied: false, success: true});
         }
     } catch (e) {
         throw createError(500, 'Error submitting form', e);
     }
-};
+});

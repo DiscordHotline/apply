@@ -39,14 +39,36 @@ export default async function useAuthentication(
     required: boolean = true,
 ): Promise<[any]> {
     const session = await useSession(req, res);
-    if ((!session || !session.token) && required) {
-        throw createError(401, 'Authorization Required');
-    } else if (!session || !session.token) {
+    if (!session || !session.token || !session.token.access_token) {
+        if (required) {
+            throw createError(401, 'Authorization Required');
+        }
+
         return [null];
     }
 
-    const user = await getUser(session.token.access_token);
-    user.guilds = await getGuilds(session.token.access_token);
+    if ((req as any).user) {
+        return [(req as any).user];
+    }
+
+    let user;
+    try {
+        user = await getUser(session.token.access_token);
+    } catch (e) {
+        console.error(e);
+
+        throw e;
+    }
+
+    try {
+        user.guilds = await getGuilds(session.token.access_token);
+    } catch (e) {
+        console.error(e);
+
+        throw e;
+    }
+
+    (req as any).user = user;
 
     return [user];
 }

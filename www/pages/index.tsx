@@ -1,4 +1,6 @@
 import {useContext, useState} from 'react';
+import useForm from 'react-hook-form';
+
 import {AuthContext} from '../hooks/useAuthContext';
 
 interface Form {
@@ -8,19 +10,41 @@ interface Form {
 }
 
 export default () => {
+    const {register, handleSubmit, formState, errors, reset, setError} = useForm<Form>();
+
     const user                                = useContext(AuthContext);
-    const [submitted, setSubmitted]           = useState(false);
     const [success, setSuccess]               = useState(false);
     const [alreadyApplied, setAlreadyApplied] = useState(false);
-    const [errors, setErrors]                 = useState<Form>({});
 
-    const [form, setForm] = useState<Form>({});
+    const onSubmit = async (data) => {
+        const response = await fetch('/submit', {
+            method:      'POST',
+            body:        JSON.stringify(data),
+            credentials: 'same-origin',
+            headers:     {
+                'Content-Type': 'application/json',
+            },
+        });
 
-    const submit = async () => {
+        if (!response.ok && response.status >= 500) {
+            console.log('Not OK', response.status);
 
+            return setSuccess(false);
+        }
+
+        const json = await response.json();
+        for (const field of Object.keys(json.errors || {})) {
+            const value = json.errors[field];
+            console.log({field, value});
+            setError(field as keyof Form, 'generic', value);
+        }
+        console.log({json});
+
+        setSuccess(json.success);
+        setAlreadyApplied(json.alreadyApplied);
     };
 
-    console.log({user});
+    console.log('Submitted: ', formState.isSubmitted);
 
     return (
         <div className="card">
@@ -34,12 +58,13 @@ export default () => {
                 <div className="content">
                     {user && <p>Hello {user.username},</p>}
                     <p>
-                        Discord Hotline is a networking community of moderators. It's a place
-                        where you can go to ask questions about other servers' moderation. We also
-                        have an early warning system for problematic users and raids.
+                        Discord Hotline is a community network of moderators from a multitude of servers.
+                        Whether you have questions about other servers' moderation, want to collaborate,
+                        or simply want to connect with fellow moderators, you can do it here. We also
+                        feature an early warning system for problematic users and raids.
                     </p>
 
-                    {!submitted && <p>
+                    {!formState.isSubmitted && <p>
                         If you would like to apply to join,{' '}
                         {!user ? <a href="/connect" rel="nofollow">log in.</a> : 'fill out the form below.'}
                     </p>}
@@ -49,41 +74,44 @@ export default () => {
                     <hr/>
 
                     <div className="content">
-                        {submitted && success && <p className="has-text-weight-bold">
+                        {success && <p className="has-text-weight-bold">
                             Thank you for submitting! You should hear back soon.
                         </p>}
-                        {submitted && !success && <div className="notification is-warning">
+                        {formState.isSubmitted && !success && !formState.isSubmitting &&
+                         <div className="notification is-warning">
                             {alreadyApplied
                                 ? 'This server has already been submitted before.'
                                 : 'There is an error with your submission. Please correct it and re-submit.'}
                         </div>}
-                        <form action="/" method="post">
+                        {!success && <form onSubmit={handleSubmit(onSubmit)} className="form">
                             <div className="field">
                                 <label className="label" htmlFor="server">
                                     What is the name of the server that you would like to apply with?
                                 </label>
                                 <div className="control">
-                                    <input type="text" className={`input${errors.server ? ' is-danger' : ''}`}
-                                        name="server" value={form.server} list="servers"
-                                        onChange={(e) => setForm({...form, server: e.target.value})}/>
+                                    <input name="server" type="text" className="input" list="servers"
+                                        ref={register({required: 'This field is required'})}/>
                                     <datalist id="servers">
-                                        {user.guilds.sort((g) => g.owner ? -1 : 1)
-                                             .map((g) => <option key={g.id}>{g.name}</option>)}
+                                        {user && user.guilds && user.guilds.sort((g) => g.owner ? -1 : 1)
+                                                                    .map((g) => <option key={g.id}>{g.name}</option>)}
                                     </datalist>
                                 </div>
-                                {errors.server && <p className="help is-danger">{errors.server}</p>}
+                                {errors.server && <p className="help is-danger">{errors.server.message}</p>}
                             </div>
                             <div className="field">
                                 <label className="label" htmlFor="reason">
                                     Why do you think this server is a good fit in Discord Hotline?
                                 </label>
                                 <div className="control">
-                                    <textarea name="reason" className={`textarea${errors.reason ? ' is-danger' : ''}`}
-                                        onChange={(e) => setForm({...form, reason: e.target.value})}>
-                                        {form.reason}
-                                    </textarea>
+                                    <textarea name="reason" className="textarea"
+                                        ref={register({
+                                            required: 'This field is required', minLength: {
+                                                value:   100,
+                                                message: 'Must be at least 100 characters.',
+                                            },
+                                        })}/>
                                 </div>
-                                {errors.reason && <p className="help is-danger">{errors.reason}</p>}
+                                {errors.reason && <p className="help is-danger">{errors.reason.message}</p>}
                             </div>
                             <div className="field">
                                 <label className="label" htmlFor="invite">
@@ -96,30 +124,30 @@ export default () => {
                                         </a>
                                     </p>
                                     <div className="control is-expanded">
-                                        <input type="text" className={`input${errors.invite ? ' is-danger' : ''}`}
-                                            name="invite" value={form.invite} autoComplete="off"
-                                            onChange={(e) => setForm({...form, invite: e.target.value})}/>
+                                        <input name="invite" type="text" className="input" autoComplete="off"
+                                            ref={register({required: 'This field is required'})}/>
                                     </div>
                                 </div>
-                                {errors.invite && <p className="help is-danger">{errors.invite}</p>}
+                                {errors.invite && <p className="help is-danger">{errors.invite.message}</p>}
                             </div>
 
                             <br/>
 
                             <div className="field is-grouped is-pulled-right">
                                 <div className="control">
-                                    <button type="submit" className="button is-link" onClick={submit}>
+                                    <button className="button is-link" disabled={formState.isSubmitting}
+                                        onClick={handleSubmit(onSubmit)}>
                                         Submit
                                     </button>
                                 </div>
                                 <div className="control">
-                                    <button type="reset" className="button is-text" onClick={() => setForm({})}>
+                                    <button type="reset" className="button is-text" onClick={reset}>
                                         Cancel
                                     </button>
                                 </div>
                             </div>
                             <div className="is-clearfix"/>
-                        </form>
+                        </form>}
                     </div>
                 </>}
             </div>

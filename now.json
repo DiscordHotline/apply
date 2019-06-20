@@ -6,6 +6,7 @@
         "hotline.gg",
         "www.hotline.gg"
     ],
+    "scope": "hotline",
     "builds":  [
         {
             "src": "api/routes/*.ts",
@@ -47,14 +48,14 @@
             "methods": ["GET"]
         },
         {
+            "src":     "/submit",
+            "dest":    "/api/routes/submit.ts",
+            "methods": ["POST"]
+        },
+        {
             "src":     "/(?<code>[^/]*)",
             "methods": ["POST"],
             "dest":    "/api/routes/invite.ts?code=$code"
-        },
-        {
-            "src":     "/",
-            "dest":    "/api/routes/submit.ts",
-            "methods": ["POST"]
         },
         {
             "src":     "/(?<code>[^/]*)",
@@ -62,8 +63,12 @@
             "dest":    "/www/index?code=$code"
         },
         {
-            "src":     "/",
-            "dest":    "/www/index"
+            "src":  "/",
+            "dest": "/www/index"
+        },
+        {
+            "src":  "/(.*)",
+            "dest": "/www/$1"
         }
     ]
 }

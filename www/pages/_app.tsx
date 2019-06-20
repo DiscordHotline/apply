@@ -13,7 +13,12 @@ export default class extends App<{user: any}> {
             pageProps = await Component.getInitialProps(ctx);
         }
 
-        const user = await getUser(ctx);
+        let user;
+        try {
+            user = await getUser(ctx);
+        } catch (e) {
+            console.error('Failed fetching user: ', e);
+        }
 
         return {pageProps, user};
     }

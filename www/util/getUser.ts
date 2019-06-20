@@ -12,15 +12,26 @@ export default async function getUser(ctx: NextContext) {
             Cookie: await ctx.req.headers.cookie,
         };
     }
-    ;
 
-    const response = await fetch(url + '/session', opts);
+    let response;
+    try {
+        response = await fetch(url + '/session', opts);
+    } catch (e) {
+        console.log('Session not okay', e);
+
+        return null;
+    }
+
     if (!response.ok) {
         console.log('Session not okay', response.statusText);
+
         return null;
     }
 
     const json = await response.json();
+    if (!json.token || !json.user) {
+        return null;
+    }
 
     return {
         ...json.user,

@@ -13,7 +13,7 @@ const getCredentials = async () => {
 };
 
 const getGuild = async (id: string) => {
-    return database.getRepository(Entities.Guild).findOne(id);
+    return database.getRepository(Entities.Guild).findOne({guildId: id});
 };
 
 const getInvite = async (code: string) => {
