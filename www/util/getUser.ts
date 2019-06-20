@@ -1,9 +1,6 @@
 import fetch from 'isomorphic-unfetch';
 import {NextContext} from 'next';
-
-const url = process.env.NOW_REGION === 'dev1'
-    ? 'http://localhost:3000'
-    : 'https://apply.hotline.gg';
+import getApiUrl from './getApiUrl';
 
 export default async function getUser(ctx: NextContext) {
     const opts: RequestInit = {credentials: 'include'};
@@ -15,7 +12,7 @@ export default async function getUser(ctx: NextContext) {
 
     let response;
     try {
-        response = await fetch(url + '/session', opts);
+        response = await fetch(getApiUrl() + '/session', opts);
     } catch (e) {
         console.log('Session not okay', e);
 

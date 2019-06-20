@@ -53,6 +53,11 @@
             "methods": ["POST"]
         },
         {
+            "src":     "/guildByCode/(?<code>[^/]*)",
+            "dest":    "/api/routes/getGuildByCode.ts?code=$code",
+            "methods": ["GET"]
+        },
+        {
             "src":     "/(?<code>[^/]*)",
             "methods": ["POST"],
             "dest":    "/api/routes/invite.ts?code=$code"
@@ -60,7 +65,7 @@
         {
             "src":     "/(?<code>[^/]*)",
             "methods": ["GET"],
-            "dest":    "/www/index?code=$code"
+            "dest":    "/www/join?code=$code"
         },
         {
             "src":  "/",

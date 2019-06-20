@@ -37,18 +37,18 @@ export default async function useAuthentication(
     req: NowRequest,
     res: NowResponse,
     required: boolean = true,
-): Promise<[any]> {
+): Promise<[any, any]> {
     const session = await useSession(req, res);
     if (!session || !session.token || !session.token.access_token) {
         if (required) {
             throw createError(401, 'Authorization Required');
         }
 
-        return [null];
+        return [null, null];
     }
 
     if ((req as any).user) {
-        return [(req as any).user];
+        return [(req as any).user, session.token];
     }
 
     let user;
@@ -68,9 +68,11 @@ export default async function useAuthentication(
         throw e;
     }
 
+    user.token = session.token;
+
     (req as any).user = user;
 
-    return [user];
+    return [user, session.token];
 }
 
 

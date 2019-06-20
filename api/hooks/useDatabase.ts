@@ -17,7 +17,7 @@ const getGuild = async (id: string) => {
 };
 
 const getInvite = async (code: string) => {
-    return database.getRepository(Entities.Invite).findOne(code);
+    return database.getRepository(Entities.Invite).findOne({code});
 };
 
 export default async function useDatabase() {

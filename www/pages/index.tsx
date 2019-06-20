@@ -38,13 +38,10 @@ export default () => {
             console.log({field, value});
             setError(field as keyof Form, 'generic', value);
         }
-        console.log({json});
 
         setSuccess(json.success);
         setAlreadyApplied(json.alreadyApplied);
     };
-
-    console.log('Submitted: ', formState.isSubmitted);
 
     return (
         <div className="card">
