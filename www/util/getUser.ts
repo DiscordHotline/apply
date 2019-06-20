@@ -12,7 +12,7 @@ export default async function getUser(ctx: NextContext) {
 
     let response;
     try {
-        response = await fetch(getApiUrl() + '/session', opts);
+        response = await fetch(getApiUrl(ctx.req) + '/session', opts);
     } catch (e) {
         console.log('Session not okay', e);
 

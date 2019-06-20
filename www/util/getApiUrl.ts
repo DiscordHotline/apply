@@ -1,5 +1,9 @@
-export default function getApiUrl() {
-    return process.env.NOW_REGION === 'dev1'
-        ? 'http://localhost:3000'
-        : 'https://apply.hotline.gg';
+import {IncomingMessage} from 'http';
+
+export default function getApiUrl(req?: IncomingMessage) {
+    if (!req) {
+        return window.origin;
+    }
+
+    return req.headers['x-now-deployment-url'] || 'http://localhost:3000';
 }

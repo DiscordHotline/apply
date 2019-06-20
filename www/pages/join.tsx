@@ -97,13 +97,16 @@ const Page = ({guild, code}) => {
 Page.getInitialProps = async ({req, res, query}: NextContext) => {
     if (!req.headers.cookie) {
         res.statusCode = 301;
-        res.setHeader('Location', getApiUrl() + '/connect');
+        res.setHeader('Location', getApiUrl(req) + '/connect');
         res.end();
 
         return;
     }
 
-    const response = await fetch(getApiUrl() + '/guildByCode/' + query.code, {headers: {cookie: req.headers.cookie}});
+    const response = await fetch(
+        getApiUrl(req) + '/guildByCode/' + query.code,
+        {headers: {cookie: req.headers.cookie}},
+    );
     const json     = await response.json();
 
     return {guild: json.guild, code: query.code};
