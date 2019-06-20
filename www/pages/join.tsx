@@ -94,22 +94,18 @@ const Page = ({guild, code}) => {
     );
 };
 
-Page.getInitialProps = async ({req, res, query}: NextContext) => {
-    if (!req.headers.cookie) {
-        res.statusCode = 301;
-        res.setHeader('Location', getUrl(req) + '/connect');
-        res.end();
+Page.getInitialProps = async ({req, query}: NextContext) => {
+    try {
+        const response = await fetch(
+            getUrl(req) + '/guildByCode/' + query.code,
+            {headers: {cookie: req.headers.cookie}},
+        );
+        const json     = await response.json();
 
-        return;
+        return {guild: json.guild, code: query.code};
+    } catch (e) {
+        return {guild: null, code: query.code};
     }
-
-    const response = await fetch(
-        getUrl(req) + '/guildByCode/' + query.code,
-        {headers: {cookie: req.headers.cookie}},
-    );
-    const json     = await response.json();
-
-    return {guild: json.guild, code: query.code};
 };
 
 export default Page;
