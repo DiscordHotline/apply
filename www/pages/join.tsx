@@ -3,7 +3,7 @@ import Router from 'next/router';
 import {useContext, useState} from 'react';
 
 import {AuthContext} from '../hooks/useAuthContext';
-import getApiUrl from '../util/getApiUrl';
+import getUrl from '../util/getUrl';
 
 const Page = ({guild, code}) => {
     const user                          = useContext(AuthContext);
@@ -97,14 +97,14 @@ const Page = ({guild, code}) => {
 Page.getInitialProps = async ({req, res, query}: NextContext) => {
     if (!req.headers.cookie) {
         res.statusCode = 301;
-        res.setHeader('Location', getApiUrl(req) + '/connect');
+        res.setHeader('Location', getUrl(req) + '/connect');
         res.end();
 
         return;
     }
 
     const response = await fetch(
-        getApiUrl(req) + '/guildByCode/' + query.code,
+        getUrl(req) + '/guildByCode/' + query.code,
         {headers: {cookie: req.headers.cookie}},
     );
     const json     = await response.json();

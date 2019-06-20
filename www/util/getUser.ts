@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-unfetch';
 import {NextContext} from 'next';
-import getApiUrl from './getApiUrl';
+import getUrl from './getUrl';
 
 export default async function getUser(ctx: NextContext) {
     const opts: RequestInit = {credentials: 'include'};
@@ -12,7 +12,7 @@ export default async function getUser(ctx: NextContext) {
 
     let response;
     try {
-        response = await fetch(getApiUrl(ctx.req) + '/session', opts);
+        response = await fetch(getUrl(ctx.req) + '/session', opts);
     } catch (e) {
         console.log('Session not okay', e);
 

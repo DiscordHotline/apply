@@ -6,7 +6,7 @@
         "hotline.gg",
         "www.hotline.gg"
     ],
-    "scope": "hotline",
+    "scope":   "hotline",
     "builds":  [
         {
             "src": "api/routes/*.ts",
@@ -24,7 +24,7 @@
     },
     "routes":  [
         {
-            "src":  "/favicon.ico",
+            "src":    "/favicon.ico",
             "status": 404
         },
         {
@@ -63,13 +63,13 @@
             "dest":    "/api/routes/invite.ts?code=$code"
         },
         {
+            "src":  "/",
+            "dest": "/www/index"
+        },
+        {
             "src":     "/(?<code>[^/]*)",
             "methods": ["GET"],
             "dest":    "/www/join?code=$code"
-        },
-        {
-            "src":  "/",
-            "dest": "/www/index"
         },
         {
             "src":  "/(.*)",

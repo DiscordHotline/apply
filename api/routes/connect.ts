@@ -2,15 +2,12 @@ import {NowRequest, NowResponse} from '@now/node/dist';
 import {stringify} from 'querystring';
 import useSecret from '../hooks/useSecret';
 import useSession from '../hooks/useSession';
+import getUrl from '../util/getUrl';
 
 interface Secret {
     client_id: string;
     // secret: string;
 }
-
-const baseUrl = process.env.NOW_REGION === 'dev1'
-    ? 'http://localhost:3000'
-    : 'https://apply.hotline.gg';
 
 export default async (req: NowRequest, res: NowResponse) => {
     const session = await useSession(req, res);
@@ -25,7 +22,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     const redirect = url + stringify({
         response_type: 'code',
         scope:         scopes.join(' '),
-        redirect_uri:  `${baseUrl}/connect/callback`,
+        redirect_uri:  `${getUrl(req)}/connect/callback`,
         ...secret,
     });
 

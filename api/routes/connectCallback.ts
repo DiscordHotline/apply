@@ -5,15 +5,12 @@ import {stringify} from 'querystring';
 
 import useSecret from '../hooks/useSecret';
 import useSession from '../hooks/useSession';
+import getUrl from '../util/getUrl';
 
 interface Secret {
     client_id: string;
     secret: string;
 }
-
-const baseUrl = process.env.NOW_REGION === 'dev1'
-    ? 'http://localhost:3000'
-    : 'https://apply.hotline.gg';
 
 export default async (req: NowRequest, res: NowResponse) => {
     if (!req.query) {
@@ -34,7 +31,7 @@ export default async (req: NowRequest, res: NowResponse) => {
                     grant_type:   'authorization_code',
                     code:         req.query.code,
                     scope:        session.scopes.join(' '),
-                    redirect_uri: `${baseUrl}/connect/callback`,
+                    redirect_uri: `${getUrl(req)}/connect/callback`,
                     client_id,
                     client_secret,
                 }),
@@ -48,7 +45,7 @@ export default async (req: NowRequest, res: NowResponse) => {
         session.token = json;
 
         res.statusCode = 301;
-        res.setHeader('Location', baseUrl);
+        res.setHeader('Location', getUrl(req));
         res.end();
     } catch (e) {
         console.log(Object.keys(e));
