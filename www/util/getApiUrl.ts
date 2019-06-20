@@ -5,5 +5,5 @@ export default function getApiUrl(req?: IncomingMessage) {
         return window.origin;
     }
 
-    return req.headers['x-now-deployment-url'] || 'http://localhost:3000';
+    return `${req.headers['x-forwarded-proto']}://${req.headers['x-now-deployment-url']}` || 'http://localhost:3000';
 }
