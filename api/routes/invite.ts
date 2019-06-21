@@ -45,25 +45,34 @@ export default withErrors(async (req: NowRequest, res: NowResponse) => {
     } catch (_) {}
 
     if (existingMember) {
+        let used = false;
+
         // Check if member doesn't have the member role
         if (!existingMember.roles.includes(memberRole)) {
             await manageMemberRole(user.id, memberRole, true);
+            used = true;
         }
 
         // Check if member has applicant role
         if (existingMember.roles.includes(applicantRole)) {
             await manageMemberRole(user.id, applicantRole, false);
             await welcomeMember(user, guild.roleId);
+            used = true;
         }
 
         // Check if member only doesn't have the guild role
         if (!existingMember.roles.includes(guild.roleId)) {
             await manageMemberRole(user.id, guild.roleId, true);
             console.log(`Skipped adding ${user.id} from ${guild.id} and only added the guild role.`);
+            used = true;
         }
 
-        invite.uses++;
-        await invite.save();
+        if (used) {
+            invite.uses++;
+            await invite.save();
+        } else {
+            console.log(`Skipped adding ${user.id} from ${guild.guildId}.`);
+        }
 
         return res.status(200).json({success: true});
     }
