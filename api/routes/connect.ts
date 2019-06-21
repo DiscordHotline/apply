@@ -16,6 +16,9 @@ export default async (req: NowRequest, res: NowResponse) => {
         scopes.push(...Array.isArray(req.query.scopes) ? req.query.scopes : req.query.scopes.split(','));
     }
     session.scopes = scopes;
+    if (req.query && req.query.previousUrl) {
+        session.previousUrl = req.query.previousUrl;
+    }
 
     const [secret] = await useSecret<Secret>('hotline/discord');
     const url      = 'https://discordapp.com/oauth2/authorize?';

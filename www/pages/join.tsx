@@ -96,7 +96,7 @@ const Page = ({guild, code}) => {
 Page.getInitialProps = async ({user, req, res, query}: NextContext & {user: any}) => {
     if (!user) {
         res.statusCode = 301;
-        res.setHeader('Location', getUrl(req) + '/connect');
+        res.setHeader('Location', getUrl(req) + '/connect?previousUrl=' + req.url);
         res.end();
 
         return;

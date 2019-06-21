@@ -44,8 +44,14 @@ export default async (req: NowRequest, res: NowResponse) => {
         }
         session.token = json;
 
+        let url = getUrl(req);
+        if (session.previousUrl) {
+            url += session.previousUrl;
+            delete session.previousUrl;
+        }
+
         res.statusCode = 301;
-        res.setHeader('Location', getUrl(req));
+        res.setHeader('Location', url);
         res.end();
     } catch (e) {
         throw createError(400, 'Failed to log in.', e);
