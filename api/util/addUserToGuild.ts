@@ -33,6 +33,7 @@ export default async function addUserToGuild(user: any, roles: string[], applica
     try {
         return await request(req);
     } catch (err) {
+        console.log('Error adding user', user, err);
         const resp = err.response;
         console.log(
             'Response from GUILD_MEMBER_ADD: ',
