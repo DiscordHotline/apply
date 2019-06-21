@@ -23,7 +23,6 @@ const Page = ({guild, code}) => {
         try {
             const response = await fetch('/' + code, {credentials: 'same-origin', method: 'post'});
             const json     = await response.json();
-            console.log(json);
 
             setJoined(json.success);
             setErrorReason(json.error);
@@ -94,7 +93,15 @@ const Page = ({guild, code}) => {
     );
 };
 
-Page.getInitialProps = async ({req, query}: NextContext) => {
+Page.getInitialProps = async ({user, req, res, query}: NextContext & {user: any}) => {
+    if (!user) {
+        res.statusCode = 301;
+        res.setHeader('Location', getUrl(req) + '/connect');
+        res.end();
+
+        return;
+    }
+
     try {
         const response = await fetch(
             getUrl(req) + '/guildByCode/' + query.code,

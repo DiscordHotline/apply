@@ -35,7 +35,6 @@ export default () => {
         const json = await response.json();
         for (const field of Object.keys(json.errors || {})) {
             const value = json.errors[field];
-            console.log({field, value});
             setError(field as keyof Form, 'generic', value);
         }
 

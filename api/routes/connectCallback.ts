@@ -48,7 +48,6 @@ export default async (req: NowRequest, res: NowResponse) => {
         res.setHeader('Location', getUrl(req));
         res.end();
     } catch (e) {
-        console.log(Object.keys(e));
         throw createError(400, 'Failed to log in.', e);
     }
 }

@@ -9,15 +9,16 @@ export default class extends App<{user: any}> {
     static async getInitialProps({Component, ctx}) {
         let pageProps = {};
 
-        if (Component.getInitialProps) {
-            pageProps = await Component.getInitialProps(ctx);
-        }
-
         let user;
         try {
             user = await getUser(ctx);
+            ctx.user = user;
         } catch (e) {
             console.error('Failed fetching user: ', e);
+        }
+
+        if (Component.getInitialProps) {
+            pageProps = await Component.getInitialProps(ctx);
         }
 
         return {pageProps, user};

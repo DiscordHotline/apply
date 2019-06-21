@@ -82,8 +82,6 @@ export default withErrors(async (req: NowRequest, res: NowResponse) => {
 
         return res.status(200).json({success: true});
     } catch (e) {
-        console.error(Object.keys(e));
-
         let errorReason;
         switch (e.code) {
             case 30001: {
