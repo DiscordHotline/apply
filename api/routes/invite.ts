@@ -77,6 +77,7 @@ export default withErrors(async (req: NowRequest, res: NowResponse) => {
 
     try {
         await addUserToGuild(user, roles);
+        console.log('User added to guild');
         invite.uses++;
         await invite.save();
 

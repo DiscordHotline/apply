@@ -18,20 +18,19 @@ export default async function addUserToGuild(user: any, roles: string[], applica
     if (roles) {
         body.roles = roles;
     }
-    const req = {
-        url:     `https://discordapp.com/api/v6/guilds/${hotlineGuildId}/members/${user.id}`,
-        method:  'PUT',
-        body:    JSON.stringify(body),
-        headers: {
-            'Content-Type': 'application/json',
-            Authorization:  eris.token,
-        },
-    };
 
     console.log(`Adding ${user.id} to ${hotlineGuildId} with roles: ${JSON.stringify(body.roles)}`);
 
     try {
-        return await request(req);
+        return await request({
+            url:     `https://discordapp.com/api/v6/guilds/${hotlineGuildId}/members/${user.id}`,
+            method:  'PUT',
+            body:    JSON.stringify(body),
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization:  eris.token,
+            },
+        });
     } catch (err) {
         console.log('Error adding user', user, err);
         const resp = err.response;
