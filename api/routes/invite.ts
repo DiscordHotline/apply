@@ -86,13 +86,13 @@ export default withErrors(async (req: NowRequest, res: NowResponse) => {
         switch (e.code) {
             case 30001: {
                 errorReason = 'Maximum number of guilds reached (100)';
-                console.log(`${user} attempted to join Hotline while being at their guild limit`);
+                console.log(`${user.id} attempted to join Hotline while being at their guild limit`);
                 break;
             }
 
             case 50025: {
                 errorReason = 'Relog and try again';
-                console.log(`${user} attempted to join Hotline while their access token is invalid`);
+                console.log(`${user.id} attempted to join Hotline while their access token is invalid`);
                 break;
             }
         }

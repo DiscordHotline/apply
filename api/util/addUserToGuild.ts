@@ -14,7 +14,6 @@ const hotlineGuildId = '204100839806205953';
 export default async function addUserToGuild(user: any, roles: string[], applicant: boolean = false) {
     const eris = await useEris();
 
-    console.log({user});
     const body: Body = {access_token: user.token.access_token};
     if (roles) {
         body.roles = roles;
