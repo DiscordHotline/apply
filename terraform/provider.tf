@@ -19,3 +19,14 @@ provider "aws" {
     shared_credentials_file = var.shared_credentials_file
     profile                 = var.profile
 }
+
+# -------------------------------------
+# Cloudflare
+# -------------------------------------
+variable "cloudflare_email" {}
+variable "cloudflare_token" {}
+
+provider "cloudflare" {
+    email = var.cloudflare_email
+    token = var.cloudflare_token
+}
