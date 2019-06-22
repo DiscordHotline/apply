@@ -25,26 +25,17 @@ export default async function addUserToGuild(user: any, roles: string[], applica
     console.log(`Adding ${user.id} to ${hotlineGuildId} with roles: ${JSON.stringify(body.roles)}`);
 
     try {
-        console.log({
+        const reqOptions = {
             method:  'PUT',
             body:    JSON.stringify(body),
             headers: {
                 'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + secret.token,
+                Authorization: 'Bot ' + secret.token,
             },
-        })
-        const response = await fetch(
-            `https://discordapp.com/api/v6/guilds/${hotlineGuildId}/members/${user.id}`,
-            {
-                method:  'PUT',
-                body:    JSON.stringify(body),
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization:  'Bearer ' + secret.token,
-                },
-            }
-        );
+        }
 
+        console.log(reqOptions)
+        const response = await fetch(`https://discordapp.com/api/v6/guilds/${hotlineGuildId}/members/${user.id}`, reqOptions);
 
         if (!response.ok) {
             throw {response};
