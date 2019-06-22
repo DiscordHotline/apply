@@ -29,10 +29,6 @@ const getUser = async (accessToken: string) => {
     return apiFetch('/users/@me', accessToken);
 };
 
-const getGuilds = (accessToken: string) => {
-    return apiFetch('/users/@me/guilds', accessToken);
-};
-
 export default async function useAuthentication(
     req: NowRequest,
     res: NowResponse,
@@ -54,14 +50,6 @@ export default async function useAuthentication(
     let user;
     try {
         user = await getUser(session.token.access_token);
-    } catch (e) {
-        console.error(e);
-
-        throw e;
-    }
-
-    try {
-        user.guilds = await getGuilds(session.token.access_token);
     } catch (e) {
         console.error(e);
 

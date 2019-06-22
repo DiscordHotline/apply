@@ -85,12 +85,8 @@ export default () => {
                                     What is the name of the server that you would like to apply with?
                                 </label>
                                 <div className="control">
-                                    <input name="server" type="text" className="input" list="servers"
+                                    <input name="server" type="text" className="input"
                                         ref={register({required: 'This field is required'})}/>
-                                    <datalist id="servers">
-                                        {user && user.guilds && user.guilds.sort((g) => g.owner ? -1 : 1)
-                                                                    .map((g) => <option key={g.id}>{g.name}</option>)}
-                                    </datalist>
                                 </div>
                                 {errors.server && <p className="help is-danger">{errors.server.message}</p>}
                             </div>
