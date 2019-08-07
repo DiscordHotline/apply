@@ -1,4 +1,4 @@
-import {NowRequest, NowResponse} from '@now/node/dist';
+import {NowRequest, NowResponse} from '@now/node';
 import {stringify} from 'querystring';
 import useSecret from '../hooks/useSecret';
 import useSession from '../hooks/useSession';

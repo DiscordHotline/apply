@@ -25,7 +25,6 @@
             "./@types"
         ],
         "types":                        [
-            "node",
             "reflect-metadata"
         ]
     }
