@@ -5,8 +5,7 @@ import useSession from '../hooks/useSession';
 import getUrl from '../util/getUrl';
 
 interface Secret {
-    client_id: string;
-    // secret: string;
+    client_id: string
 }
 
 export default async (req: NowRequest, res: NowResponse) => {
@@ -20,13 +19,13 @@ export default async (req: NowRequest, res: NowResponse) => {
         session.previousUrl = req.query.previousUrl;
     }
 
-    const [secret] = await useSecret<Secret>('hotline/discord');
+    const [{client_id}] = await useSecret<Secret>('hotline/discord');
     const url      = 'https://discordapp.com/oauth2/authorize?';
     const redirect = url + stringify({
         response_type: 'code',
         scope:         scopes.join(' '),
         redirect_uri:  `${getUrl(req)}/connect/callback`,
-        ...secret,
+        client_id,
     });
 
     res.statusCode = 301;
