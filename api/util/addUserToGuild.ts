@@ -55,29 +55,15 @@ export default async function addUserToGuild(user: any, roles: string[], applica
                 err,
             );
         }
+    }
 
-        try {
-            const promises = roles.map((role) => eris.addGuildMemberRole(hotlineGuildId, user.id, role));
+    if (!applicant && !roles.includes(applicantRole)) {
+        console.log('Trying to welcome the new member')
+        const guildRole = roles[roles.length - 1];
 
-            await Promise.all(promises);
-        } catch (e) {
-            console.log('Failed adding roles to user: ', e);
-        }
-
-        console.log(applicant, roles, user.id)
-        if (!applicant && !roles.includes(applicantRole)) {
-            console.log('Trying to welcome the new member')
-            try {
-                // Remove applicant role, if its there.
-                return eris.removeGuildMemberRole(hotlineGuildId, user.id, applicantRole);
-            } finally {
-                const guildRole = roles[roles.length - 1];
-
-                if (guildRole !== applicantRole) {
-                    console.log('Welcoming new member')
-                    return welcomeMember(user, guildRole);
-                }
-            }
+        if (guildRole !== applicantRole) {
+            console.log('Welcoming new member')
+            return welcomeMember(user, guildRole)
         }
     }
 }
