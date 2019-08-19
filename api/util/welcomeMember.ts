@@ -28,4 +28,5 @@ export default async function welcomeMember(user: any, guildRole: string) {
     } catch (error) {
         console.error('Failed sending a welcome message', error);
     };
+    return
 }

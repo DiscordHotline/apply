@@ -41,6 +41,16 @@ export default async function addUserToGuild(user: any, roles: string[], applica
             throw {response};
         }
 
+        if (!applicant && !roles.includes(applicantRole)) {
+            console.log('Trying to welcome the new member')
+            const guildRole = roles[roles.length - 1];
+    
+            if (guildRole !== applicantRole) {
+                console.log('Welcoming new member')
+                await welcomeMember(user, guildRole)
+            }
+        }
+
         return await response.json();
     } catch (err) {
         const resp = err.response;
@@ -54,16 +64,6 @@ export default async function addUserToGuild(user: any, roles: string[], applica
                 resp ? resp.statusMessage : 'Error adding member',
                 err,
             );
-        }
-    }
-
-    if (!applicant && !roles.includes(applicantRole)) {
-        console.log('Trying to welcome the new member')
-        const guildRole = roles[roles.length - 1];
-
-        if (guildRole !== applicantRole) {
-            console.log('Welcoming new member')
-            return welcomeMember(user, guildRole)
         }
     }
 }
