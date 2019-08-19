@@ -64,6 +64,7 @@ export default async function addUserToGuild(user: any, roles: string[], applica
             console.log('Failed adding roles to user: ', e);
         }
 
+        console.log(applicant, roles, user.id)
         if (!applicant && !roles.includes(applicantRole)) {
             console.log('Trying to welcome the new member')
             try {
