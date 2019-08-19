@@ -64,7 +64,9 @@ export default async function addUserToGuild(user: any, roles: string[], applica
             console.log('Failed adding roles to user: ', e);
         }
 
+        console.log(applicant, roles, user.id)
         if (!applicant && !roles.includes(applicantRole)) {
+            console.log('Trying to welcome the new member')
             try {
                 // Remove applicant role, if its there.
                 return eris.removeGuildMemberRole(hotlineGuildId, user.id, applicantRole);
@@ -72,6 +74,7 @@ export default async function addUserToGuild(user: any, roles: string[], applica
                 const guildRole = roles[roles.length - 1];
 
                 if (guildRole !== applicantRole) {
+                    console.log('Welcoming new member')
                     return welcomeMember(user, guildRole);
                 }
             }
