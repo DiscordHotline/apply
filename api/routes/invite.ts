@@ -18,7 +18,7 @@ export default withErrors(async (req: NowRequest, res: NowResponse) => {
     const {getInvite} = await useDatabase();
     const eris        = await useEris();
 
-    const invite = await getInvite(req.query.code);
+    const invite = await getInvite(req.query.code as string);
     if (!invite || invite.revoked) {
         return res.status(404).json({errorReason: 'Unknown invite code', success: false});
     }
