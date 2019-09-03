@@ -8,7 +8,7 @@ export default withErrors(async (req: NowRequest, res: NowResponse) => {
     await useAuthentication(req, res, true);
     const {getInvite} = await useDatabase();
 
-    const invite = await getInvite(req.query.code);
+    const invite = await getInvite(req.query.code as string);
     if (!invite || invite.revoked) {
         return res.status(400).json({invalid: true, success: false, guild: null});
     }
