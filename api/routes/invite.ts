@@ -8,7 +8,6 @@ import addUserToGuild from '../util/addUserToGuild';
 import manageMemberRole from '../util/manageMemberRole';
 import welcomeMember from '../util/welcomeMember';
 
-// Grab from vault
 const applicantRole  = '531713467619475456';
 const memberRole     = '531617261077790720';
 const hotlineGuildId = '204100839806205953';
