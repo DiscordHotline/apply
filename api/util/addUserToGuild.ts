@@ -53,6 +53,7 @@ export default async function addUserToGuild(user: any, roles: string[], applica
 
         return await response.json();
     } catch (err) {
+        console.error(err)
         const resp = err.response;
         console.log(
             'Response from GUILD_MEMBER_ADD: ',
