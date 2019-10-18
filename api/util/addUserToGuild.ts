@@ -57,7 +57,7 @@ export default async function addUserToGuild(user: any, roles: string[], applica
         const resp = err.response;
         console.log(
             'Response from GUILD_MEMBER_ADD: ',
-            {body, statusCode: resp.status, statusMessage: resp.statusText},
+            {body, statusCode: resp.status, statusMessage: resp.statusText, respBody: resp.body},
         );
         if (err || ![201, 204].includes(resp.statusCode)) {
             throw createError(
