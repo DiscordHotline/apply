@@ -1,8 +1,8 @@
 import fetch from 'isomorphic-unfetch';
-import {NextContext} from 'next';
+import {NextPageContext} from 'next';
 import getUrl from './getUrl';
 
-export default async function getUser(ctx: NextContext) {
+export default async function getUser(ctx: NextPageContext) {
     const opts: RequestInit = {credentials: 'include'};
     if (ctx.req) {
         opts.headers = {
