@@ -41,6 +41,7 @@
         "@types/twig": "^1.12.1",
         "@types/zeit__next-typescript": "^0.1.2",
         "serverless-domain-manager": "^2.6.10",
-        "serverless-offline": "^3.31.3"
+        "serverless-offline": "^3.31.3",
+        "typescript": "^3.6.4"
     }
 }
