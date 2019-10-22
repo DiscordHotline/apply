@@ -1,18 +1,19 @@
-import {NextContext} from 'next';
+import {NextPage, NextPageContext} from 'next';
 import Router from 'next/router';
 import {useContext, useState} from 'react';
 
 import {AuthContext} from '../hooks/useAuthContext';
 import getUrl from '../util/getUrl';
 
-const Page = ({guild, code}) => {
+// TODO: Properly the the props of this page component
+const Page: NextPage<any> = ({guild, code}) => {
     const user                          = useContext(AuthContext);
     const [joined, setJoined]           = useState<boolean>(null);
     const [joining, setJoining]         = useState(false);
     const [errorReason, setErrorReason] = useState<string>(null);
 
     if (!user) {
-        return Router.replace('/connect');
+        Router.replace('/connect');
     }
 
     const join = async (e) => {
@@ -93,7 +94,7 @@ const Page = ({guild, code}) => {
     );
 };
 
-Page.getInitialProps = async ({user, req, res, query}: NextContext & {user: any}) => {
+Page.getInitialProps = async ({user, req, res, query}: NextPageContext & {user: any}) => {
     if (!user) {
         res.statusCode = 301;
         res.setHeader('Location', getUrl(req) + '/connect?previousUrl=' + req.url);
