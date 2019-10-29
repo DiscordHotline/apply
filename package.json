@@ -3,5 +3,9 @@
     "version": "1.0.0",
     "description": "Application App for Discord Hotline",
     "author": "Aaron Scherer <aequasi@gmail.com",
-    "private": true
+    "private": true,
+    "engines": {
+        "node": "^10"
+    }
 }
+  
