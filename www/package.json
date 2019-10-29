@@ -43,5 +43,8 @@
         "serverless-domain-manager": "^2.6.10",
         "serverless-offline": "^3.31.3",
         "typescript": "^3.6.4"
+    },
+    "engines": {
+        "node": "^10"
     }
 }

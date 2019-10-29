@@ -26,5 +26,8 @@
     "@types/request": "^2.48.1",
     "@types/request-promise": "^4.1.44",
     "typescript": "^3.5.2"
+  },
+  "engines": {
+      "node": "^10"
   }
 }
