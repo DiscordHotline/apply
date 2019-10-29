@@ -133,7 +133,7 @@ export default () => {
                                     </button>
                                 </div>
                                 <div className="control">
-                                    <button type="reset" className="button is-text" onClick={reset}>
+                                    <button type="reset" className="button is-text" onClick={() => reset()}>
                                         Cancel
                                     </button>
                                 </div>
