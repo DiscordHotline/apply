@@ -25,6 +25,7 @@ export default async (req: NowRequest, res: NowResponse) => {
         response_type: 'code',
         scope:         scopes.join(' '),
         redirect_uri:  `${getUrl(req)}/connect/callback`,
+        prompt:        'none',
         client_id,
     });
 
