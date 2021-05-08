@@ -15,7 +15,7 @@
     "node-fetch": "^2.6.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "typeorm": "^0.2.18"
+    "typeorm": "^0.2.25"
   },
   "devDependencies": {
     "@types/cookie-session": "^2.0.37",
